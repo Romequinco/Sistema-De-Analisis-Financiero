@@ -357,6 +357,284 @@ class DataProvider:
                 logger.warning(f"Error eliminando cache {cache_file.name}: {e}")
 
 
+# Funciones de utilidad para visualización
+def format_number(value: Union[float, int]) -> str:
+    """
+    Formatea números grandes en formato legible (B, M, K).
+    
+    Args:
+        value: Valor numérico a formatear
+    
+    Returns:
+        String formateado
+    """
+    if pd.isna(value) or value == 0:
+        return 'N/A'
+    if abs(value) >= 1e9:
+        return f"${value/1e9:.2f}B"
+    elif abs(value) >= 1e6:
+        return f"${value/1e6:.2f}M"
+    elif abs(value) >= 1e3:
+        return f"${value/1e3:.2f}K"
+    else:
+        return f"${value:.2f}"
+
+
+def create_fundamental_tables(fundamental_data: Dict) -> Dict[str, pd.DataFrame]:
+    """
+    Crea DataFrames organizados por categorías para datos fundamentales.
+    
+    Args:
+        fundamental_data: Diccionario con datos fundamentales
+    
+    Returns:
+        Diccionario con DataFrames por categoría
+    """
+    tables = {}
+    
+    # Tabla 1: Información General
+    general_data = {
+        'Métrica': ['Nombre', 'Sector', 'Industria'],
+        'Valor': [
+            fundamental_data.get('name', 'N/A'),
+            fundamental_data.get('sector', 'N/A'),
+            fundamental_data.get('industry', 'N/A')
+        ]
+    }
+    tables['general'] = pd.DataFrame(general_data)
+    
+    # Tabla 2: Valoración
+    valuation_data = {
+        'Métrica': [
+            'Market Cap',
+            'Enterprise Value',
+            'PE Ratio',
+            'Forward PE',
+            'PEG Ratio',
+            'Price to Book',
+            'Price to Sales',
+            'Dividend Yield',
+            'Payout Ratio'
+        ],
+        'Valor': [
+            f"${fundamental_data.get('market_cap', 0):,.0f}" if fundamental_data.get('market_cap') is not None else 'N/A',
+            f"${fundamental_data.get('enterprise_value', 0):,.0f}" if fundamental_data.get('enterprise_value') is not None else 'N/A',
+            f"{fundamental_data.get('pe_ratio', 0):.2f}" if fundamental_data.get('pe_ratio') is not None else 'N/A',
+            f"{fundamental_data.get('forward_pe', 0):.2f}" if fundamental_data.get('forward_pe') is not None else 'N/A',
+            f"{fundamental_data.get('peg_ratio', 0):.2f}" if fundamental_data.get('peg_ratio') is not None else 'N/A',
+            f"{fundamental_data.get('price_to_book', 0):.2f}" if fundamental_data.get('price_to_book') is not None else 'N/A',
+            f"{fundamental_data.get('price_to_sales', 0):.2f}" if fundamental_data.get('price_to_sales') is not None else 'N/A',
+            f"{fundamental_data.get('dividend_yield', 0)*100:.2f}%" if fundamental_data.get('dividend_yield') is not None else 'N/A',
+            f"{fundamental_data.get('payout_ratio', 0)*100:.2f}%" if fundamental_data.get('payout_ratio') is not None else 'N/A'
+        ]
+    }
+    tables['valuation'] = pd.DataFrame(valuation_data)
+    
+    # Tabla 3: Rentabilidad
+    profitability_data = {
+        'Métrica': [
+            'ROE (Return on Equity)',
+            'ROA (Return on Assets)',
+            'Profit Margin',
+            'Operating Margin'
+        ],
+        'Valor': [
+            f"{fundamental_data.get('roe', 0)*100:.2f}%" if fundamental_data.get('roe') is not None else 'N/A',
+            f"{fundamental_data.get('roa', 0)*100:.2f}%" if fundamental_data.get('roa') is not None else 'N/A',
+            f"{fundamental_data.get('profit_margin', 0)*100:.2f}%" if fundamental_data.get('profit_margin') is not None else 'N/A',
+            f"{fundamental_data.get('operating_margin', 0)*100:.2f}%" if fundamental_data.get('operating_margin') is not None else 'N/A'
+        ]
+    }
+    tables['profitability'] = pd.DataFrame(profitability_data)
+    
+    # Tabla 4: Crecimiento
+    growth_data = {
+        'Métrica': [
+            'Revenue Growth',
+            'Earnings Growth'
+        ],
+        'Valor': [
+            f"{fundamental_data.get('revenue_growth', 0)*100:.2f}%" if fundamental_data.get('revenue_growth') is not None else 'N/A',
+            f"{fundamental_data.get('earnings_growth', 0)*100:.2f}%" if fundamental_data.get('earnings_growth') is not None else 'N/A'
+        ]
+    }
+    tables['growth'] = pd.DataFrame(growth_data)
+    
+    # Tabla 5: Salud Financiera
+    health_data = {
+        'Métrica': [
+            'Debt to Equity',
+            'Current Ratio',
+            'Quick Ratio',
+            'Beta'
+        ],
+        'Valor': [
+            f"{fundamental_data.get('debt_to_equity', 0):.2f}" if fundamental_data.get('debt_to_equity') is not None else 'N/A',
+            f"{fundamental_data.get('current_ratio', 0):.2f}" if fundamental_data.get('current_ratio') is not None else 'N/A',
+            f"{fundamental_data.get('quick_ratio', 0):.2f}" if fundamental_data.get('quick_ratio') is not None else 'N/A',
+            f"{fundamental_data.get('beta', 0):.2f}" if fundamental_data.get('beta') is not None else 'N/A'
+        ]
+    }
+    tables['health'] = pd.DataFrame(health_data)
+    
+    # Tabla 6: Precios y Recomendaciones
+    price_data_table = {
+        'Métrica': [
+            'Precio Actual',
+            '52 Week High',
+            '52 Week Low',
+            'Target Price',
+            'Recomendación',
+            'Número de Analistas'
+        ],
+        'Valor': [
+            f"${fundamental_data.get('current_price', 0):.2f}" if fundamental_data.get('current_price') is not None else 'N/A',
+            f"${fundamental_data.get('52_week_high', 0):.2f}" if fundamental_data.get('52_week_high') is not None else 'N/A',
+            f"${fundamental_data.get('52_week_low', 0):.2f}" if fundamental_data.get('52_week_low') is not None else 'N/A',
+            f"${fundamental_data.get('target_price', 0):.2f}" if fundamental_data.get('target_price') is not None else 'N/A',
+            fundamental_data.get('recommendation', 'N/A') or 'N/A',
+            f"{fundamental_data.get('number_of_analysts', 0)}" if fundamental_data.get('number_of_analysts') is not None else 'N/A'
+        ]
+    }
+    tables['prices'] = pd.DataFrame(price_data_table)
+    
+    return tables
+
+
+def create_historical_tables(
+    income_statement: pd.DataFrame,
+    balance_sheet: pd.DataFrame,
+    cashflow_statement: pd.DataFrame,
+    max_years: int = 5
+) -> Dict[str, pd.DataFrame]:
+    """
+    Crea tablas con evolución histórica de métricas financieras.
+    
+    Args:
+        income_statement: DataFrame con estado de resultados
+        balance_sheet: DataFrame con balance general
+        cashflow_statement: DataFrame con flujo de efectivo
+        max_years: Número máximo de años a mostrar
+    
+    Returns:
+        Diccionario con DataFrames históricos por categoría
+    """
+    tables = {}
+    
+    # Obtener las últimas N columnas (años) disponibles
+    max_cols = min(max_years, income_statement.shape[1])
+    years = income_statement.columns[:max_cols]
+    
+    # Tabla 1: Ingresos y Beneficios
+    income_metrics = {
+        'Total Revenue': 'Total Revenue',
+        'Cost of Revenue': 'Cost Of Revenue',
+        'Gross Profit': 'Gross Profit',
+        'Operating Income': 'Operating Income',
+        'Net Income': 'Net Income',
+        'EBITDA': 'EBITDA'
+    }
+    
+    income_history = {}
+    for metric_name, metric_key in income_metrics.items():
+        if metric_key in income_statement.index:
+            values = []
+            for year in years:
+                val = income_statement.loc[metric_key, year]
+                values.append(format_number(val) if not pd.isna(val) else 'N/A')
+            income_history[metric_name] = values
+    
+    if income_history:
+        tables['income_history'] = pd.DataFrame(income_history, index=[str(y)[:4] for y in years])
+    
+    # Tabla 2: Balance General
+    balance_metrics = {
+        'Total Assets': 'Total Assets',
+        'Total Liabilities': 'Total Liab',
+        'Total Stockholder Equity': 'Stockholders Equity',
+        'Cash And Cash Equivalents': 'Cash And Cash Equivalents',
+        'Total Debt': 'Total Debt',
+        'Current Assets': 'Current Assets',
+        'Current Liabilities': 'Current Liabilities'
+    }
+    
+    balance_history = {}
+    for metric_name, metric_key in balance_metrics.items():
+        if metric_key in balance_sheet.index:
+            values = []
+            for year in years:
+                val = balance_sheet.loc[metric_key, year]
+                values.append(format_number(val) if not pd.isna(val) else 'N/A')
+            balance_history[metric_name] = values
+    
+    if balance_history:
+        tables['balance_history'] = pd.DataFrame(balance_history, index=[str(y)[:4] for y in years])
+    
+    # Tabla 3: Flujo de Efectivo
+    cashflow_metrics = {
+        'Operating Cash Flow': 'Total Cash From Operating Activities',
+        'Capital Expenditure': 'Capital Expenditures',
+        'Dividends Paid': 'Dividends Paid',
+        'Net Borrowings': 'Net Borrowings'
+    }
+    
+    cashflow_history = {}
+    for metric_name, metric_key in cashflow_metrics.items():
+        if metric_key in cashflow_statement.index:
+            values = []
+            for year in years:
+                val = cashflow_statement.loc[metric_key, year]
+                values.append(format_number(val) if not pd.isna(val) else 'N/A')
+            cashflow_history[metric_name] = values
+    
+    # Calcular Free Cash Flow
+    if 'Total Cash From Operating Activities' in cashflow_statement.index and 'Capital Expenditures' in cashflow_statement.index:
+        fcf_values = []
+        for year in years:
+            operating_cf = cashflow_statement.loc['Total Cash From Operating Activities', year]
+            capex = cashflow_statement.loc['Capital Expenditures', year]
+            if not pd.isna(operating_cf) and not pd.isna(capex):
+                fcf = operating_cf - abs(capex)  # Capex es negativo
+                fcf_values.append(format_number(fcf))
+            else:
+                fcf_values.append('N/A')
+        cashflow_history['Free Cash Flow'] = fcf_values
+    
+    if cashflow_history:
+        tables['cashflow_history'] = pd.DataFrame(cashflow_history, index=[str(y)[:4] for y in years])
+    
+    # Tabla 4: Ratios Calculados Históricos
+    ratios_history = {}
+    
+    for year in years:
+        year_str = str(year)[:4]
+        
+        # Obtener valores del año
+        revenue = income_statement.loc['Total Revenue', year] if 'Total Revenue' in income_statement.index else None
+        net_income = income_statement.loc['Net Income', year] if 'Net Income' in income_statement.index else None
+        total_assets = balance_sheet.loc['Total Assets', year] if 'Total Assets' in balance_sheet.index else None
+        total_equity = balance_sheet.loc['Stockholders Equity', year] if 'Stockholders Equity' in balance_sheet.index else None
+        total_debt = balance_sheet.loc['Total Debt', year] if 'Total Debt' in balance_sheet.index else None
+        
+        # Calcular ratios
+        profit_margin = (net_income / revenue * 100) if revenue and net_income and revenue != 0 else None
+        roa = (net_income / total_assets * 100) if net_income and total_assets and total_assets != 0 else None
+        roe = (net_income / total_equity * 100) if net_income and total_equity and total_equity != 0 else None
+        debt_to_equity = (total_debt / total_equity) if total_debt and total_equity and total_equity != 0 else None
+        
+        ratios_history[year_str] = {
+            'Profit Margin (%)': f"{profit_margin:.2f}%" if profit_margin is not None else 'N/A',
+            'ROA (%)': f"{roa:.2f}%" if roa is not None else 'N/A',
+            'ROE (%)': f"{roe:.2f}%" if roe is not None else 'N/A',
+            'Debt/Equity': f"{debt_to_equity:.2f}" if debt_to_equity is not None else 'N/A'
+        }
+    
+    if ratios_history:
+        tables['ratios_history'] = pd.DataFrame(ratios_history).T
+    
+    return tables
+
+
 # Función de conveniencia para uso rápido
 def get_data(symbol: str, period: str = "1y", use_cache: bool = True) -> Dict:
     """

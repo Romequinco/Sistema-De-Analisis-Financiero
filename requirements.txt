@@ -28,6 +28,7 @@ pytest-cov>=4.1.0
 jupyter>=1.0.0
 ipykernel>=6.25.0
 notebook>=7.0.0
+ipython>=8.0.0  # Para mejor soporte de display en notebooks
 
 # Code quality (opcional para desarrollo)
 # black>=23.0.0
