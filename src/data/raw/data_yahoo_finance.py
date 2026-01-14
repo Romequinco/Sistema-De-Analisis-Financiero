@@ -45,7 +45,7 @@ class DataProvider:
             max_retries: Número máximo de reintentos en caso de error (default: 3)
         """
         if cache_dir is None:
-            cache_dir = Path(__file__).parent.parent.parent / "data" / "raw"
+            cache_dir = Path(__file__).parent.parent.parent.parent / "data" / "raw"
         
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)

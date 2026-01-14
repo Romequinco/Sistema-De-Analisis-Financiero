@@ -1,5 +1,9 @@
 # [CONFIG] Módulo de Configuración
 
+## [UBICACION] Ubicación
+
+`src/config/`
+
 ## [OBJETIVO] Objetivo
 
 Este módulo maneja la configuración del sistema, incluyendo parámetros, pesos y ajustes.

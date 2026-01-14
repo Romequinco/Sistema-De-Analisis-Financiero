@@ -1,230 +1,89 @@
-# [DATA] Módulo de Extracción de Datos
+# [DATA] Módulo de Datos Financieros
 
 ## [OBJETIVO] Objetivo
 
-Este módulo proporciona una interfaz unificada para obtener datos financieros de múltiples fuentes, principalmente usando **yfinance** como proveedor principal.
+Este módulo se encarga de **obtener y preparar** datos financieros para su uso en el sistema de análisis.
 
-## [CARACTERISTICAS] Características Principales
+El módulo `data` es la primera etapa del pipeline y proporciona datos limpios y normalizados a los módulos de análisis.
 
-- **Abstracción de fuente de datos**: Interfaz única independiente del proveedor
-- **Cache local**: Evita llamadas innecesarias a APIs externas
-- **Manejo robusto de errores**: Gestión adecuada de fallos y datos faltantes
-- **Normalización**: Datos consistentes independientemente de la fuente
-- **Múltiples tipos de datos**: Precios, fundamentales, estados financieros
-
-## [ARQUITECTURA] Arquitectura
+## [ESTRUCTURA] Estructura del Módulo
 
 ```
-DataProvider
-├── Cache Management
-│   ├── Validación TTL
-│   ├── Guardado/Lectura
-│   └── Limpieza
-├── Price Data
-│   └── Históricos OHLCV
-├── Fundamental Data
-│   └── Métricas y ratios
-└── Financial Statements
-    ├── Income Statement
-    ├── Balance Sheet
-    └── Cash Flow
+src/data/
+├── raw/          Extracción de datos desde fuentes externas
+│   └── data.md   Documentación exhaustiva del módulo raw
+└── cleaning/     Limpieza y preprocesamiento de datos
+    └── cleaning.md   Documentación exhaustiva del módulo cleaning
 ```
+
+## [COMPONENTES] Componentes
+
+### Raw (`src/data/raw/`)
+
+Módulo de extracción de datos desde Yahoo Finance.
+
+**Características principales**:
+- Extracción de datos desde Yahoo Finance usando yfinance
+- Cache local con TTL configurable (1 hora por defecto)
+- Reintentos automáticos con backoff exponencial
+- Manejo robusto de errores y fallback a cache
+- Soporte para múltiples tipos de datos (precios, fundamentales, estados financieros)
+
+**Ver documentación completa**: `src/data/raw/data.md`
+
+### Cleaning (`src/data/cleaning/`)
+
+Módulo de limpieza y preprocesamiento de datos financieros.
+
+**Características principales**:
+- Limpieza y normalización de datos OHLCV
+- Validación de relaciones OHLC (High >= Low, etc.)
+- Manejo inteligente de valores nulos (forward-fill, backward-fill, interpolate)
+- Eliminación de duplicados y detección de outliers
+- Añadir columnas auxiliares (returns, log_returns, volatilidad)
+- Metadata completa de todas las transformaciones
+
+**Ver documentación completa**: `src/data/cleaning/cleaning.md`
 
 ## [USO] Uso Básico
 
-### Inicialización
-
 ```python
-from src.data import DataProvider
+from src.data import DataProvider, DataCleaner
 
-# Con parámetros por defecto
+# Extraer datos
 provider = DataProvider()
+raw_data = provider.get_price_data("AAPL", period="1y", interval="1d")
 
-# Con configuración personalizada
-provider = DataProvider(
-    cache_dir="data/raw",
-    timeout=120,      # Timeout en segundos
-    max_retries=5    # Número de reintentos
-)
+# Limpiar datos
+cleaner = DataCleaner()
+cleaned_data, metadata = cleaner.clean_price_data(raw_data, symbol="AAPL")
+
+# Ver qué se limpió
+print(metadata.summary())
 ```
 
-### Obtener datos de precios
+## [FLUJO] Flujo de Datos
 
-```python
-# Datos históricos de 1 año
-price_data = provider.get_price_data("AAPL", period="1y", interval="1d")
-
-# Columnas disponibles:
-# - Open, High, Low, Close
-# - Volume
-# - Dividends
-# - Stock Splits
+```
+DataProvider (raw)
+    ↓
+Datos Crudos
+    ↓
+DataCleaner (cleaning)
+    ↓
+Datos Limpios
+    ↓
+Módulos de Análisis
 ```
 
-### Obtener datos fundamentales
+## [ESTADO] Estado
 
-```python
-fundamental = provider.get_fundamental_data("AAPL")
+- ✅ [IMPLEMENTADO] Extracción desde Yahoo Finance (`raw/`)
+- ✅ [IMPLEMENTADO] Limpieza y preprocesamiento (`cleaning/`)
 
-# Incluye:
-# - Ratios de valoración (PE, PB, PS)
-# - Métricas de crecimiento
-# - Ratios de rentabilidad (ROE, ROA)
-# - Ratios de solvencia
-# - Información de mercado
-```
+## [DOCUMENTACION] Documentación Detallada
 
-### Obtener estados financieros
+Para información exhaustiva sobre cada componente:
 
-```python
-# Estado de resultados
-income = provider.get_financial_statements("AAPL", "income")
-
-# Balance general
-balance = provider.get_financial_statements("AAPL", "balance")
-
-# Flujo de efectivo
-cashflow = provider.get_financial_statements("AAPL", "cashflow")
-```
-
-### Obtener todos los datos
-
-```python
-all_data = provider.get_all_data("AAPL", period="1y")
-
-# Retorna diccionario con:
-# - price_data
-# - fundamental_data
-# - income_statement
-# - balance_sheet
-# - cashflow_statement
-```
-
-### Función de conveniencia
-
-```python
-from src.data import get_data
-
-data = get_data("AAPL", period="1y")
-```
-
-## [VISUALIZACION] Funciones de Visualización
-
-El módulo incluye funciones auxiliares para crear tablas formateadas:
-
-### Crear tablas de datos fundamentales
-
-```python
-from src.data import create_fundamental_tables
-
-fundamental = provider.get_fundamental_data("AAPL")
-tables = create_fundamental_tables(fundamental)
-
-# Retorna diccionario con DataFrames organizados:
-# - tables['general']: Información general
-# - tables['valuation']: Métricas de valoración
-# - tables['profitability']: Métricas de rentabilidad
-# - tables['growth']: Métricas de crecimiento
-# - tables['health']: Salud financiera
-# - tables['prices']: Precios y recomendaciones
-```
-
-### Crear tablas históricas
-
-```python
-from src.data import create_historical_tables
-
-income = provider.get_financial_statements("AAPL", "income")
-balance = provider.get_financial_statements("AAPL", "balance")
-cashflow = provider.get_financial_statements("AAPL", "cashflow")
-
-historical_tables = create_historical_tables(
-    income, balance, cashflow, max_years=5
-)
-
-# Retorna diccionario con:
-# - historical_tables['income_history']: Evolución de ingresos
-# - historical_tables['balance_history']: Evolución del balance
-# - historical_tables['cashflow_history']: Evolución del flujo de efectivo
-# - historical_tables['ratios_history']: Evolución de ratios clave
-```
-
-### Formatear números
-
-```python
-from src.data import format_number
-
-format_number(1500000000)  # "$1.50B"
-format_number(50000000)    # "$50.00M"
-format_number(1000)        # "$1.00K"
-```
-
-## [CACHE] Sistema de Cache
-
-El módulo implementa un sistema de cache local para:
-
-- Reducir llamadas a APIs externas
-- Mejorar velocidad de respuesta
-- Trabajar offline con datos recientes
-
-**TTL por defecto**: 1 hora
-
-**Ubicación**: `data/raw/`
-
-**Formato**: Archivos pickle (.pkl)
-
-### Limpiar cache
-
-```python
-# Limpiar todo el cache
-provider.clear_cache()
-
-# Limpiar cache de un símbolo específico
-provider.clear_cache("AAPL")
-```
-
-## [PERIODOS] Períodos Disponibles
-
-Para datos de precios:
-
-- `1d`, `5d`, `1mo`, `3mo`, `6mo`, `1y`, `2y`, `5y`, `10y`, `ytd`, `max`
-
-## [INTERVALOS] Intervalos Disponibles
-
-- `1m`, `2m`, `5m`, `15m`, `30m`, `60m`, `90m`, `1h`, `1d`, `5d`, `1wk`, `1mo`, `3mo`
-
-## [TIPOS_ACTIVOS] Tipos de Activos Soportados
-
-- Acciones (ej: "AAPL", "MSFT")
-- ETFs (ej: "SPY", "QQQ")
-- Criptomonedas (ej: "BTC-USD", "ETH-USD")
-- Índices (ej: "^GSPC")
-- Cualquier símbolo soportado por Yahoo Finance
-
-## [ERRORES] Manejo de Errores
-
-El módulo maneja automáticamente:
-
-- Símbolos inválidos
-- Datos faltantes
-- Errores de red y timeouts
-- Problemas de cache
-- Reintentos automáticos con backoff exponencial
-- Uso de cache antiguo cuando falla la descarga
-
-**Características de robustez:**
-- Reintentos automáticos (3 por defecto, configurable)
-- Timeout configurable (60 segundos por defecto)
-- Backoff exponencial entre reintentos
-- Fallback a cache antiguo si la descarga falla
-- Manejo robusto de valores None y datos faltantes
-
-Todos los errores se registran en el logger y se propagan con mensajes descriptivos.
-
-## [FUTURO] Mejoras Futuras
-
-- Soporte para múltiples proveedores (Alpha Vantage, Polygon, etc.)
-- Cache distribuido (Redis)
-- Validación de datos
-- Transformaciones automáticas
-- Soporte para datos en tiempo real
+- **Extracción de datos**: Ver `src/data/raw/data.md`
+- **Limpieza de datos**: Ver `src/data/cleaning/cleaning.md`

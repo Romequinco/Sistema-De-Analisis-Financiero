@@ -1,5 +1,9 @@
 # [UTILS] Módulo de Utilidades
 
+## [UBICACION] Ubicación
+
+`src/utils/`
+
 ## [OBJETIVO] Objetivo
 
 Este módulo contiene funciones auxiliares y utilidades compartidas por otros módulos.
