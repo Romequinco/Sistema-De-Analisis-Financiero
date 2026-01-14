@@ -1,311 +1,352 @@
-# [TECHNICAL] Módulo de Análisis Técnico
-
-## [UBICACION] Ubicación
-
-`src/analisis/technical/`
+# Módulo de Análisis Técnico
 
 ## [OBJETIVO] Objetivo
 
-Este módulo implementa **indicadores técnicos** y **estrategias de trading** basadas en análisis técnico para generar señales normalizadas que alimentan el sistema de scoring.
+Este módulo proporciona una **colección completa de indicadores técnicos** para análisis de datos financieros. Los indicadores están organizados en categorías y son funciones puras que pueden combinarse para crear análisis técnico robusto.
+
+**Filosofía clave**: Este módulo solo calcula indicadores. No genera señales de trading ni estrategias. Es la base sobre la cual se construirán módulos de estrategias y scoring.
 
 ---
 
-## [ESTADO] Estado Actual
+## [FILOSOFIA] Filosofía del Análisis Técnico
 
-Módulo en desarrollo inicial. Pendiente de implementación.
+### ¿Qué es el Análisis Técnico?
 
----
+El análisis técnico es el estudio de movimientos de precio y volumen históricos para predecir movimientos futuros. Se basa en tres principios fundamentales:
 
-## [ARQUITECTURA] Arquitectura del Módulo
+1. **El precio descuenta todo**: Toda la información relevante está reflejada en el precio
+2. **Los precios se mueven en tendencias**: Las tendencias persisten hasta que se revierten
+3. **La historia se repite**: Los patrones históricos tienden a repetirse
 
-```
-TechnicalAnalyzer
-├── Indicadores de Tendencia
-│   ├── SMA (Simple Moving Average)
-│   ├── EMA (Exponential Moving Average)
-│   ├── WMA (Weighted Moving Average)
-│   └── MACD (Moving Average Convergence Divergence)
-├── Indicadores de Momentum
-│   ├── RSI (Relative Strength Index)
-│   ├── Stochastic Oscillator
-│   ├── Williams %R
-│   └── CCI (Commodity Channel Index)
-├── Indicadores de Volatilidad
-│   ├── Bollinger Bands
-│   ├── ATR (Average True Range)
-│   └── Keltner Channels
-├── Indicadores de Volumen
-│   ├── OBV (On-Balance Volume)
-│   ├── Volume SMA
-│   └── Volume Profile
-└── Estrategias Técnicas
-    ├── Momentum Strategy
-    ├── Mean Reversion Strategy
-    ├── Breakout Strategy
-    └── Trend Following Strategy
-```
+### Limitaciones del Análisis Técnico
+
+Es importante reconocer las limitaciones:
+
+- **No predice el futuro con certeza**: Solo proporciona probabilidades
+- **Puede generar señales falsas**: Especialmente en mercados laterales
+- **Requiere combinación**: Un solo indicador rara vez es suficiente
+- **Depende del contexto**: Funciona mejor en ciertos tipos de mercado
+- **No considera fundamentales**: Ignora eventos corporativos y macroeconómicos
+
+### Cuándo es Útil
+
+- **Mercados con tendencia**: Funciona mejor cuando hay tendencias claras
+- **Timeframes cortos**: Más útil en análisis de corto plazo
+- **Liquidez alta**: Requiere suficiente volumen para ser confiable
+- **Como complemento**: Mejor cuando se combina con análisis fundamental
 
 ---
 
-## [FUNCIONALIDADES] Funcionalidades Planificadas
+## [ESTRUCTURA] Estructura del Módulo
 
-### Indicadores Técnicos Básicos
-
-#### Medias Móviles
-
-- **SMA (Simple Moving Average)**: Media aritmética simple
-- **EMA (Exponential Moving Average)**: Media exponencial ponderada
-- **WMA (Weighted Moving Average)**: Media ponderada linealmente
-- **Uso**: Identificar tendencias y cruces de medias
-
-#### Indicadores de Momentum
-
-- **RSI (Relative Strength Index)**: Fuerza relativa (0-100)
-  - RSI > 70: Sobrecompra
-  - RSI < 30: Sobreventa
-- **Stochastic Oscillator**: Posición relativa en rango
-- **Williams %R**: Momentum inverso
-- **CCI (Commodity Channel Index)**: Desviación de la media
-
-#### Indicadores de Volatilidad
-
-- **Bollinger Bands**: Bandas de volatilidad alrededor de SMA
-  - Precio cerca de banda superior: Posible sobrecompra
-  - Precio cerca de banda inferior: Posible sobreventa
-- **ATR (Average True Range)**: Volatilidad absoluta
-- **Keltner Channels**: Bandas basadas en ATR
-
-#### Indicadores de Volumen
-
-- **OBV (On-Balance Volume)**: Acumulación de volumen
-- **Volume SMA**: Media móvil de volumen
-- **Volume Profile**: Distribución de volumen por precio
-
-### Estrategias Técnicas
-
-#### Momentum Strategy
-
-- Identifica activos con momentum positivo/negativo
-- Señales basadas en múltiples indicadores de momentum
-- Normalización: -1 (momentum negativo fuerte) a +1 (momentum positivo fuerte)
-
-#### Mean Reversion Strategy
-
-- Identifica activos que se desvían de su media
-- Señales basadas en Bollinger Bands, RSI extremos
-- Normalización: -1 (sobrecompra extrema) a +1 (sobreventa extrema)
-
-#### Breakout Strategy
-
-- Identifica rupturas de niveles de soporte/resistencia
-- Señales basadas en volumen y volatilidad
-- Normalización: -1 (ruptura bajista) a +1 (ruptura alcista)
-
-#### Trend Following Strategy
-
-- Identifica y sigue tendencias establecidas
-- Señales basadas en cruces de medias y MACD
-- Normalización: -1 (tendencia bajista) a +1 (tendencia alcista)
-
----
-
-## [USO] Uso Previsto
-
-### Inicialización
-
-```python
-from src.analisis.technical import TechnicalAnalyzer
-
-# Crear analizador técnico
-analyzer = TechnicalAnalyzer(
-    price_data=cleaned_price_data,
-    volume_data=cleaned_price_data['Volume']
-)
 ```
-
-### Calcular Indicadores
-
-```python
-# Calcular RSI
-rsi = analyzer.calculate_rsi(period=14)
-
-# Calcular MACD
-macd, signal, histogram = analyzer.calculate_macd()
-
-# Calcular Bollinger Bands
-upper, middle, lower = analyzer.calculate_bollinger_bands(period=20, std=2)
-```
-
-### Generar Señales de Estrategias
-
-```python
-# Señal de momentum
-momentum_signal = analyzer.momentum_strategy()
-
-# Señal de mean reversion
-mean_reversion_signal = analyzer.mean_reversion_strategy()
-
-# Señal de breakout
-breakout_signal = analyzer.breakout_strategy()
-
-# Señal de trend following
-trend_signal = analyzer.trend_following_strategy()
-```
-
-### Obtener Señales Normalizadas
-
-```python
-# Todas las señales normalizadas (-1 a +1)
-signals = analyzer.get_all_signals()
-
-# Retorna diccionario:
-# {
-#     'momentum': 0.75,
-#     'mean_reversion': -0.30,
-#     'breakout': 0.50,
-#     'trend_following': 0.60
-# }
+src/analisis/technical/
+├── indicators/              Indicadores básicos por categoría
+│   ├── trend.py            Indicadores de tendencia
+│   ├── momentum.py         Indicadores de momentum
+│   ├── volatility.py       Indicadores de volatilidad
+│   ├── volume.py           Indicadores de volumen
+│   ├── price_action.py     Análisis de acción de precio
+│   └── indicators.md       Documentación exhaustiva
+│
+├── composite_indicators/    Indicadores compuestos avanzados
+│   ├── macd.py             MACD
+│   ├── ichimoku.py         Ichimoku Cloud
+│   ├── supertrend.py       SuperTrend
+│   ├── adaptive_ma.py       Medias móviles adaptativas
+│   └── composite_indicators.md  Documentación exhaustiva
+│
+├── notebooks/              Notebooks de test y ejemplos
+│   ├── indicators_test.ipynb
+│   └── composite_indicators_test.ipynb
+│
+└── technical.md            Este archivo
 ```
 
 ---
 
-## [NORMALIZACION] Normalización de Señales
+## [INDICADORES_BASICOS] Indicadores Básicos vs. Compuestos
 
-Todas las señales se normalizan al rango **[-1, +1]**:
+### Indicadores Básicos
 
-- **+1**: Señal muy alcista (compra fuerte)
-- **0**: Neutral
-- **-1**: Señal muy bajista (venta fuerte)
+Los indicadores básicos miden un aspecto específico del mercado:
 
-### Ventajas de la Normalización
+**Categorías**:
+- **Tendencia**: SMA, EMA, Parabolic SAR
+- **Momentum**: RSI, ADX, Stochastic RSI
+- **Volatilidad**: ATR, Bollinger Bands
+- **Volumen**: Volume indicators, VWAP, MFI, Market Profile, Volume Profile
+- **Acción de Precio**: Fractales, Wyckoff (conceptual)
 
-- Comparabilidad entre estrategias diferentes
-- Agregación sencilla en el módulo de scoring
-- Interpretación intuitiva
-- Escalabilidad a nuevas estrategias
+**Características**:
+- Cálculo directo y simple
+- Interpretación más directa
+- Miden un aspecto específico
+- Fáciles de entender y usar
+
+**Cuándo usar**:
+- Cuando se necesita medir un aspecto específico
+- Para análisis inicial y exploratorio
+- Como componentes de análisis más complejo
+- Para validación y confirmación
+
+### Indicadores Compuestos
+
+Los indicadores compuestos combinan múltiples componentes:
+
+**Indicadores disponibles**:
+- **MACD**: Combina múltiples EMAs para momentum y tendencia
+- **Ichimoku**: Sistema completo con 5 componentes
+- **SuperTrend**: Combina ATR y precio para tendencia adaptativa
+- **Adaptive MA**: Ajusta velocidad según volatilidad
+
+**Características**:
+- Cálculo más complejo
+- Interpretación más rica pero también más compleja
+- Integran múltiples conceptos
+- Proporcionan visión más holística
+
+**Cuándo usar**:
+- Cuando se necesita análisis más completo
+- Para sistemas de trading más sofisticados
+- Cuando se quiere reducir número de indicadores
+- Para análisis de múltiples aspectos simultáneamente
 
 ---
 
 ## [INTEGRACION] Integración con Otros Módulos
 
-### Entrada
+### Con Módulo de Datos
 
-- **Datos limpios**: Precios OHLCV del módulo `data/cleaning`
-- **Requisitos**:
-  - Datos ordenados cronológicamente
-  - Sin gaps temporales significativos
-  - Returns calculados
+**Entrada requerida**:
+- Datos OHLCV limpios del módulo `data/cleaning`
+- Datos ordenados cronológicamente
+- Sin gaps temporales significativos
 
-### Salida
-
-- **Señales normalizadas**: Diccionario con señales de cada estrategia
-- **Formato**: `{'strategy_name': signal_value}` donde `signal_value` ∈ [-1, +1]
-
-### Flujo
-
+**Flujo**:
 ```
-Datos Limpios (OHLCV)
+DataProvider (extracción)
     ↓
-TechnicalAnalyzer
+DataCleaner (limpieza)
+    ↓
+Indicadores Técnicos (cálculo)
+```
+
+**Ejemplo**:
+```python
+from src.data import DataProvider, DataCleaner
+from src.analisis.technical.indicators import trend, momentum
+
+# Obtener y limpiar datos
+provider = DataProvider()
+raw_data = provider.get_price_data("AAPL", period="1y")
+
+cleaner = DataCleaner()
+cleaned_data, metadata = cleaner.clean_price_data(raw_data)
+
+# Calcular indicadores
+df = trend.calculate_sma(cleaned_data, period=20)
+df = momentum.calculate_rsi(df, period=14)
+```
+
+### Con Análisis Fundamental
+
+**Complementariedad**:
+- **Análisis Técnico**: Qué está pasando (precio, volumen, momentum)
+- **Análisis Fundamental**: Por qué está pasando (métricas financieras, eventos)
+
+**Uso combinado**:
+- Análisis técnico para timing de entrada/salida
+- Análisis fundamental para selección de activos
+- Confirmación cruzada entre ambos enfoques
+
+**Ejemplo conceptual**:
+Una empresa con fundamentales sólidos (análisis fundamental positivo) pero precio en sobreventa técnica (RSI < 30) puede ser una oportunidad de compra. El análisis técnico ayuda a identificar el mejor momento de entrada.
+
+### Con Sistema de Scoring
+
+**Rol del análisis técnico**:
+- Proporciona señales normalizadas (-1 a +1)
+- Contribuye al score técnico
+- Se combina con señales fundamentales
+
+**Flujo**:
+```
+Indicadores Técnicos
     ↓
 Señales Normalizadas
     ↓
 Scoring Engine
+    ↓
+Score Unificado
 ```
+
+**Ejemplo**:
+- RSI > 70 → Señal técnica negativa (-0.5)
+- MACD cruce alcista → Señal técnica positiva (+0.7)
+- Bollinger Bands sobrecompra → Señal técnica negativa (-0.3)
+- Agregación → Score técnico total
 
 ---
 
-## [ALGORITMOS] Algoritmos Clave
+## [USO] Uso del Módulo
 
-### RSI (Relative Strength Index)
+### Patrón Básico
 
-```
-RSI = 100 - (100 / (1 + RS))
-RS = Average Gain / Average Loss
-```
-
-- Período típico: 14 días
-- RSI > 70: Sobrecompra (señal bajista)
-- RSI < 30: Sobreventa (señal alcista)
-
-### MACD (Moving Average Convergence Divergence)
-
-```
-MACD Line = EMA(12) - EMA(26)
-Signal Line = EMA(9) of MACD Line
-Histogram = MACD Line - Signal Line
-```
-
-- Cruce alcista: MACD cruza por encima de Signal
-- Cruce bajista: MACD cruza por debajo de Signal
-
-### Bollinger Bands
-
-```
-Middle Band = SMA(20)
-Upper Band = Middle + (2 * StdDev)
-Lower Band = Middle - (2 * StdDev)
-```
-
-- Precio toca banda superior: Posible sobrecompra
-- Precio toca banda inferior: Posible sobreventa
-
----
-
-## [CONFIGURACION] Parámetros Configurables
-
-### Períodos por Defecto
-
-- **RSI**: 14 períodos
-- **MACD**: 12, 26, 9 períodos
-- **Bollinger Bands**: 20 períodos, 2 desviaciones estándar
-- **SMA/EMA**: 50, 200 períodos (comúnmente usados)
-
-### Personalización
+Todos los indicadores siguen el mismo patrón:
 
 ```python
-analyzer = TechnicalAnalyzer(
-    rsi_period=14,
-    macd_fast=12,
-    macd_slow=26,
-    macd_signal=9,
-    bollinger_period=20,
-    bollinger_std=2
+# 1. Importar el módulo
+from src.analisis.technical.indicators import trend, momentum
+
+# 2. Calcular indicador (añade columnas al DataFrame)
+df = trend.calculate_sma(df, period=20)
+
+# 3. Acceder a resultados
+df['SMA_20']  # Columna con la SMA
+```
+
+### Combinación de Indicadores
+
+```python
+from src.analisis.technical.indicators import trend, momentum, volatility, volume
+from src.analisis.technical.composite_indicators import macd
+
+# Calcular múltiples indicadores
+df = trend.calculate_sma(df, period=50)
+df = trend.calculate_ema(df, period=20)
+df = momentum.calculate_rsi(df, period=14)
+df = volatility.calculate_bollinger_bands(df, period=20)
+df = volume.calculate_vwap(df)
+df = macd.calculate_macd(df)
+
+# Ahora df tiene múltiples columnas de indicadores
+```
+
+### Parámetros Configurables
+
+Todos los indicadores tienen parámetros configurables:
+
+```python
+# SMA con período personalizado
+df = trend.calculate_sma(df, period=50)
+
+# RSI con período y nombre de columna personalizados
+df = momentum.calculate_rsi(df, period=21, output_column='RSI_Long')
+
+# Bollinger Bands con múltiples parámetros
+df = volatility.calculate_bollinger_bands(
+    df, 
+    period=20, 
+    std_dev=2.5,
+    output_prefix='BB_Custom'
 )
 ```
 
 ---
 
-## [VALIDACION] Validación y Testing
+## [BEST_PRACTICES] Mejores Prácticas
 
-### Validación de Indicadores
+### 1. Siempre usar datos limpios
 
-- Comparación con implementaciones estándar (pandas_ta, ta-lib)
-- Verificación de rangos (RSI entre 0-100, señales entre -1 y +1)
-- Testing con datos históricos conocidos
+Los indicadores asumen datos limpios. Siempre pasar datos por `DataCleaner` primero.
 
-### Backtesting
+### 2. Combinar múltiples categorías
 
-- Las señales deben ser históricamente válidas (no usar datos futuros)
-- Validación de que las señales se generan correctamente en el tiempo
-- Verificación de que no hay look-ahead bias
+No depender de un solo tipo de indicador:
+- Tendencia + Momentum + Volumen
+- Técnico + Fundamental
+
+### 3. Validar con datos históricos
+
+Antes de usar en trading real, validar con datos históricos (backtesting).
+
+### 4. Ajustar parámetros según activo
+
+Diferentes activos pueden requerir diferentes parámetros:
+- Acciones: RSI 14, SMA 20/50
+- Criptomonedas: Puede requerir períodos más cortos
+- Forex: Puede requerir períodos más largos
+
+### 5. Entender limitaciones
+
+Cada indicador tiene limitaciones. Entenderlas antes de usar.
+
+### 6. No sobrecargar con indicadores
+
+Demasiados indicadores pueden generar señales contradictorias. Mejor pocos bien entendidos que muchos sin entender.
 
 ---
 
-## [LIMITACIONES] Limitaciones Conocidas
+## [LIMITACIONES] Limitaciones del Módulo
 
-- Los indicadores técnicos son **lagging** (retrasados)
-- Pueden generar **señales falsas** en mercados laterales
-- Requieren **datos suficientes** (mínimo de períodos históricos)
-- No consideran **eventos fundamentales** (solo precio y volumen)
+### Limitaciones Técnicas
+
+1. **No genera señales**: Solo calcula indicadores. Las señales se generan en módulos separados.
+
+2. **No optimiza parámetros**: Los parámetros deben ajustarse manualmente o en módulos de optimización.
+
+3. **No hace backtesting**: El backtesting se hace en módulos separados.
+
+4. **Requiere datos limpios**: Asume datos ya procesados por `DataCleaner`.
+
+### Limitaciones Conceptuales
+
+1. **Análisis técnico tiene limitaciones**: No predice el futuro con certeza.
+
+2. **Puede generar señales falsas**: Especialmente en mercados laterales.
+
+3. **Requiere combinación**: Un solo indicador rara vez es suficiente.
+
+4. **Depende del contexto**: Funciona mejor en ciertos tipos de mercado.
 
 ---
 
 ## [FUTURO] Mejoras Futuras
 
-- Indicadores avanzados (Ichimoku, Fibonacci)
-- Machine learning para optimización de parámetros
-- Análisis multi-timeframe
-- Detección automática de patrones (candlestick patterns)
-- Integración con datos de sentimiento
-- Optimización de estrategias con walk-forward analysis
+### Indicadores Adicionales
+
+- Más indicadores de momentum (CCI, Williams %R)
+- Más indicadores de volumen (OBV avanzado)
+- Indicadores de ciclo (Elliott Wave básico)
+- Indicadores de sentimiento (si hay datos disponibles)
+
+### Optimización
+
+- Optimización automática de parámetros
+- Detección automática de mejores períodos
+- Validación estadística de indicadores
+
+### Machine Learning
+
+- Indicadores basados en ML
+- Detección automática de patrones
+- Predicción de mejor indicador según condiciones
+
+### Integración
+
+- Integración más profunda con análisis fundamental
+- Señales automáticas normalizadas
+- Backtesting integrado
+
+---
+
+## [DOCUMENTACION] Documentación Adicional
+
+Para información detallada sobre cada categoría:
+
+- **Indicadores básicos**: Ver `indicators/indicators.md`
+- **Indicadores compuestos**: Ver `composite_indicators/composite_indicators.md`
+- **Ejemplos de uso**: Ver notebooks en `notebooks/`
+
+---
+
+## [NOTAS] Notas Finales
+
+Este módulo es la **base** del sistema de análisis técnico. Proporciona las herramientas necesarias para calcular indicadores, pero la interpretación, generación de señales y estrategias se implementan en módulos separados.
+
+**Filosofía de diseño**:
+- **Modular**: Cada indicador es independiente
+- **Extensible**: Fácil añadir nuevos indicadores
+- **Explicable**: Código claro y documentado
+- **Preparado para crecer**: Arquitectura escalable
