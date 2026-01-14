@@ -2,7 +2,7 @@
 Módulo de extracción de datos financieros.
 """
 
-from .data import (
+from .data_yahoo_finance import (
     DataProvider,
     get_data,
     format_number,

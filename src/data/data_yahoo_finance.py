@@ -1,8 +1,12 @@
 """
-Módulo de extracción de datos financieros usando yfinance.
+Módulo de extracción de datos financieros usando Yahoo Finance (yfinance).
 
 Este módulo proporciona una interfaz unificada para obtener datos de mercado
-de acciones, ETFs, criptomonedas y otros activos financieros.
+de acciones, ETFs, criptomonedas y otros activos financieros a través de
+Yahoo Finance como proveedor de datos.
+
+Implementación específica para Yahoo Finance. Para usar otros proveedores,
+crear módulos similares (ej: data_alpha_vantage.py, data_polygon.py).
 """
 
 import yfinance as yf

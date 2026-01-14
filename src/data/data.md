@@ -35,9 +35,17 @@ DataProvider
 ### Inicialización
 
 ```python
-from src.data.data import DataProvider
+from src.data import DataProvider
 
-provider = DataProvider(cache_dir="data/raw")
+# Con parámetros por defecto
+provider = DataProvider()
+
+# Con configuración personalizada
+provider = DataProvider(
+    cache_dir="data/raw",
+    timeout=120,      # Timeout en segundos
+    max_retries=5    # Número de reintentos
+)
 ```
 
 ### Obtener datos de precios
@@ -95,9 +103,60 @@ all_data = provider.get_all_data("AAPL", period="1y")
 ### Función de conveniencia
 
 ```python
-from src.data.data import get_data
+from src.data import get_data
 
 data = get_data("AAPL", period="1y")
+```
+
+## [VISUALIZACION] Funciones de Visualización
+
+El módulo incluye funciones auxiliares para crear tablas formateadas:
+
+### Crear tablas de datos fundamentales
+
+```python
+from src.data import create_fundamental_tables
+
+fundamental = provider.get_fundamental_data("AAPL")
+tables = create_fundamental_tables(fundamental)
+
+# Retorna diccionario con DataFrames organizados:
+# - tables['general']: Información general
+# - tables['valuation']: Métricas de valoración
+# - tables['profitability']: Métricas de rentabilidad
+# - tables['growth']: Métricas de crecimiento
+# - tables['health']: Salud financiera
+# - tables['prices']: Precios y recomendaciones
+```
+
+### Crear tablas históricas
+
+```python
+from src.data import create_historical_tables
+
+income = provider.get_financial_statements("AAPL", "income")
+balance = provider.get_financial_statements("AAPL", "balance")
+cashflow = provider.get_financial_statements("AAPL", "cashflow")
+
+historical_tables = create_historical_tables(
+    income, balance, cashflow, max_years=5
+)
+
+# Retorna diccionario con:
+# - historical_tables['income_history']: Evolución de ingresos
+# - historical_tables['balance_history']: Evolución del balance
+# - historical_tables['cashflow_history']: Evolución del flujo de efectivo
+# - historical_tables['ratios_history']: Evolución de ratios clave
+```
+
+### Formatear números
+
+```python
+from src.data import format_number
+
+format_number(1500000000)  # "$1.50B"
+format_number(50000000)    # "$50.00M"
+format_number(1000)        # "$1.00K"
 ```
 
 ## [CACHE] Sistema de Cache
@@ -148,8 +207,17 @@ El módulo maneja automáticamente:
 
 - Símbolos inválidos
 - Datos faltantes
-- Errores de red
+- Errores de red y timeouts
 - Problemas de cache
+- Reintentos automáticos con backoff exponencial
+- Uso de cache antiguo cuando falla la descarga
+
+**Características de robustez:**
+- Reintentos automáticos (3 por defecto, configurable)
+- Timeout configurable (60 segundos por defecto)
+- Backoff exponencial entre reintentos
+- Fallback a cache antiguo si la descarga falla
+- Manejo robusto de valores None y datos faltantes
 
 Todos los errores se registran en el logger y se propagan con mensajes descriptivos.
 

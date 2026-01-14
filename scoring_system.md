@@ -1,5 +1,9 @@
 # [SCORING] Sistema de Scoring Propuesto
 
+## [ESTADO] Estado Actual
+
+**PENDIENTE DE IMPLEMENTACIÓN** - Este documento describe el diseño del sistema de scoring que se implementará.
+
 ## [OBJETIVO] Objetivo
 Convertir múltiples señales heterogéneas en un **score unificado, normalizado y explicable**.
 

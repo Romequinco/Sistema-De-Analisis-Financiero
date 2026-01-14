@@ -43,27 +43,30 @@ Cada paso es independiente, testeable y reemplazable.
 project/
 │
 ├── src/
-│   ├── data/
-│   ├── technical/
-│   ├── fundamental/
-│   ├── scoring/
-│   ├── decision/
-│   ├── visualization/
-│   ├── config/
-│   └── utils/
+│   ├── data/              [IMPLEMENTADO] Extracción de datos con yfinance
+│   ├── technical/         [PENDIENTE] Análisis técnico
+│   ├── fundamental/       [PENDIENTE] Análisis fundamental
+│   ├── scoring/           [PENDIENTE] Sistema de scoring
+│   ├── decision/          [PENDIENTE] Motor de decisión
+│   ├── visualization/     [PENDIENTE] Visualización y reporting
+│   ├── config/            [PENDIENTE] Configuración
+│   └── utils/             [PENDIENTE] Utilidades
 │
 ├── data/
-│   ├── raw/
-│   └── processed/
+│   ├── raw/               Cache de datos descargados
+│   └── processed/         Datos procesados
 │
 ├── notebooks/
+│   └── data_test.ipynb    Notebook de prueba del módulo data
 │
 ├── docs/
 │
 ├── tests/
 │
-├── .github/workflows/
+├── venv/                  Entorno virtual Python
 │
+├── requirements.txt       Dependencias del proyecto
+├── .gitignore
 └── README.md
 ```
 
@@ -75,13 +78,47 @@ Cada módulo contiene obligatoriamente:
 
 - `module.py` → lógica principal
 - `module.md` → explicación visual y conceptual
-- `module_test.ipynb` → notebook de test con:
+- `__init__.py` → exports del módulo
+- `module_test.ipynb` → notebook de test (en carpeta notebooks/) con:
   - prints intermedios
   - tablas
   - visualizaciones
   - debugging
 
+**Nota**: Los notebooks solo llaman funciones del módulo `src`, no contienen lógica de negocio.
+
 ---
+
+## [ESTADO] Estado Actual del Proyecto
+
+### [IMPLEMENTADO] Módulo Data
+
+- Extracción de datos con yfinance
+- Cache local con TTL configurable
+- Reintentos automáticos con backoff exponencial
+- Manejo robusto de errores y timeouts
+- Funciones de visualización (tablas formateadas)
+- Soporte para precios, fundamentales y estados financieros
+- Notebook de prueba completo (`notebooks/data_test.ipynb`)
+
+**Características implementadas:**
+- `DataProvider`: Clase principal para extracción de datos
+- `get_price_data()`: Datos históricos OHLCV
+- `get_fundamental_data()`: Métricas fundamentales
+- `get_financial_statements()`: Estados financieros históricos
+- `create_fundamental_tables()`: Tablas organizadas de datos fundamentales
+- `create_historical_tables()`: Evolución histórica de métricas
+- `format_number()`: Formateo de números grandes
+
+### [PENDIENTE] Módulos Restantes
+
+- **Technical**: Análisis técnico e indicadores
+- **Fundamental**: Análisis fundamental y estrategias
+- **Scoring**: Sistema de scoring unificado
+- **Decision**: Motor de decisión y clasificación
+- **Visualization**: Visualización avanzada y reportes
+- **Config**: Sistema de configuración
+- **Utils**: Utilidades compartidas
 
 ## [RESULTADOS] Resultados esperados
 
@@ -102,6 +139,43 @@ Arquitectura preparada para:
 - Machine Learning
 - Conexión con brokers reales
 - Nuevas estrategias y mercados
+
+---
+
+## [INSTALACION] Instalación y Uso
+
+### Requisitos
+
+- Python 3.12+
+- Entorno virtual (recomendado)
+
+### Setup
+
+```bash
+# Crear entorno virtual
+python -m venv venv
+
+# Activar entorno virtual (Windows)
+.\venv\Scripts\Activate.ps1
+
+# Instalar dependencias
+pip install -r requirements.txt
+```
+
+### Uso Básico
+
+```python
+from src.data import DataProvider, get_data
+
+# Obtener datos de un activo
+provider = DataProvider()
+data = provider.get_all_data("AAPL", period="1y")
+
+# O usar función de conveniencia
+data = get_data("AAPL", period="1y")
+```
+
+Ver `notebooks/data_test.ipynb` para ejemplos completos.
 
 ---
 
