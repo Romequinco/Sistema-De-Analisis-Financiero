@@ -1,6 +1,6 @@
-# 📊 Proyecto de Evaluación de Activos Financieros
+# [SISTEMA] Proyecto de Evaluación de Activos Financieros
 
-## 🎯 Objetivo
+## [OBJETIVO] Objetivo
 Este proyecto tiene como objetivo evaluar activos financieros (acciones, ETFs, criptomonedas, etc.) de forma **agnóstica al mercado**, combinando **análisis técnico** y **análisis fundamental** en un sistema cuantitativo, explicable y modular.
 
 El resultado final es un **score numérico**, una **clasificación discreta** (Strong Buy / Buy / Neutral / Sell / Strong Sell) y una **explicación detallada** del porqué de la decisión.
@@ -12,7 +12,7 @@ El proyecto está diseñado para:
 
 ---
 
-## 🧠 Filosofía del sistema
+## [FILOSOFIA] Filosofía del sistema
 
 - Modular y extensible
 - Explicable (no caja negra)
@@ -22,7 +22,7 @@ El proyecto está diseñado para:
 
 ---
 
-## 🧱 Arquitectura General
+## [ARQUITECTURA] Arquitectura General
 
 El sistema sigue un pipeline claro:
 
@@ -37,7 +37,7 @@ Cada paso es independiente, testeable y reemplazable.
 
 ---
 
-## 📂 Estructura del repositorio
+## [ESTRUCTURA] Estructura del repositorio
 
 ```
 project/
@@ -69,7 +69,7 @@ project/
 
 ---
 
-## 📦 Estructura interna de cada módulo
+## [MODULOS] Estructura interna de cada módulo
 
 Cada módulo contiene obligatoriamente:
 
@@ -83,7 +83,7 @@ Cada módulo contiene obligatoriamente:
 
 ---
 
-## 📊 Resultados esperados
+## [RESULTADOS] Resultados esperados
 
 - Score numérico total
 - Clasificación discreta
@@ -94,7 +94,7 @@ Cada módulo contiene obligatoriamente:
 
 ---
 
-## 🔮 Futuro del proyecto
+## [FUTURO] Futuro del proyecto
 
 Arquitectura preparada para:
 - Backtesting
@@ -105,4 +105,4 @@ Arquitectura preparada para:
 
 ---
 
-⚠️ **Disclaimer**: Este proyecto no constituye asesoramiento financiero.
+[AVISO] **Disclaimer**: Este proyecto no constituye asesoramiento financiero.

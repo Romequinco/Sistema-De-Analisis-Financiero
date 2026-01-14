@@ -1,11 +1,11 @@
-# 🧮 Sistema de Scoring Propuesto
+# [SCORING] Sistema de Scoring Propuesto
 
-## 🎯 Objetivo
+## [OBJETIVO] Objetivo
 Convertir múltiples señales heterogéneas en un **score unificado, normalizado y explicable**.
 
 ---
 
-## 1️⃣ Nivel 1: Señales individuales
+## 1. Nivel 1: Señales individuales
 
 Cada indicador o métrica devuelve una señal normalizada:
 
@@ -22,7 +22,7 @@ Ejemplos:
 
 ---
 
-## 2️⃣ Nivel 2: Scores por estrategia
+## 2. Nivel 2: Scores por estrategia
 
 Cada estrategia agrega señales relacionadas:
 
@@ -39,7 +39,7 @@ Ejemplos:
 
 ---
 
-## 3️⃣ Nivel 3: Scores por bloque
+## 3. Nivel 3: Scores por bloque
 
 Se agrupan estrategias:
 
@@ -53,7 +53,7 @@ Score_bloque = Σ(score_estrategia × peso_estrategia)
 
 ---
 
-## 4️⃣ Nivel 4: Score total
+## 4. Nivel 4: Score total
 
 ```
 Score_total = w_técnico × Score_técnico + w_fundamental × Score_fundamental
@@ -63,7 +63,7 @@ Rango final normalizado `[-1, +1]` o `[-100, +100]`.
 
 ---
 
-## 5️⃣ Clasificación discreta
+## 5. Clasificación discreta
 
 | Score total | Clasificación |
 |------------|---------------|
@@ -75,7 +75,7 @@ Rango final normalizado `[-1, +1]` o `[-100, +100]`.
 
 ---
 
-## 6️⃣ Explicabilidad
+## 6. Explicabilidad
 
 El sistema debe guardar:
 - Señales individuales
@@ -90,7 +90,7 @@ Ejemplo de explicación:
 
 ---
 
-## 🔧 Optimización futura
+## [CONFIGURACION] Optimización futura
 
 Pesos:
 - Definidos inicialmente por teoría
@@ -99,7 +99,7 @@ Pesos:
 
 ---
 
-## ✅ Ventajas del sistema
+## [VENTAJAS] Ventajas del sistema
 
 - Modular
 - Explicable

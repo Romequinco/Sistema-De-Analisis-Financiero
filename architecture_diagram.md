@@ -1,4 +1,4 @@
-# 📐 Diagrama Conceptual del Sistema
+# [DIAGRAMA] Diagrama Conceptual del Sistema
 
 ```mermaid
 flowchart TD
@@ -41,7 +41,7 @@ I --> J[Reporte Final]
 
 ---
 
-## 🔍 Descripción del flujo
+## [DESCRIPCION] Descripción del flujo
 
 - **Data Provider**: abstrae la fuente de datos
 - **Cache**: evita llamadas innecesarias
