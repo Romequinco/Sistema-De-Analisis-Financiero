@@ -1,0 +1,34 @@
+# Core dependencies
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Data provider
+yfinance>=0.2.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Technical analysis (opcional, para indicadores avanzados)
+# ta-lib>=0.4.0  # Requiere instalación separada de TA-Lib C library
+# pandas-ta>=0.3.14b0  # Alternativa más fácil de instalar
+
+# Data processing
+python-dateutil>=2.8.0
+
+# Configuration
+pyyaml>=6.0
+
+# Testing (opcional para desarrollo)
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Jupyter notebooks
+jupyter>=1.0.0
+ipykernel>=6.25.0
+notebook>=7.0.0
+
+# Code quality (opcional para desarrollo)
+# black>=23.0.0
+# flake8>=6.0.0
+# mypy>=1.5.0
