@@ -8,6 +8,7 @@ yfinance>=0.2.0
 # Visualization
 matplotlib>=3.7.0
 seaborn>=0.12.0
+mplfinance>=0.12.0
 
 # Technical analysis (opcional, para indicadores avanzados)
 # ta-lib>=0.4.0  # Requiere instalación separada de TA-Lib C library

@@ -13,6 +13,7 @@ import pickle
 import json
 from typing import Optional, Dict, List, Union
 import logging
+import time
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -30,12 +31,14 @@ class DataProvider:
     - Manejo de errores robusto
     """
     
-    def __init__(self, cache_dir: Optional[Path] = None):
+    def __init__(self, cache_dir: Optional[Path] = None, timeout: int = 60, max_retries: int = 3):
         """
         Inicializa el proveedor de datos.
         
         Args:
             cache_dir: Directorio para almacenar cache. Por defecto: data/raw/
+            timeout: Timeout en segundos para las peticiones (default: 60)
+            max_retries: Número máximo de reintentos en caso de error (default: 3)
         """
         if cache_dir is None:
             cache_dir = Path(__file__).parent.parent.parent / "data" / "raw"
@@ -45,6 +48,10 @@ class DataProvider:
         
         # Configuración de cache (en horas)
         self.cache_ttl = 1  # 1 hora por defecto
+        
+        # Configuración de red
+        self.timeout = timeout
+        self.max_retries = max_retries
     
     def _get_cache_path(self, symbol: str, data_type: str) -> Path:
         """Genera la ruta del archivo de cache."""
@@ -106,27 +113,56 @@ class DataProvider:
             if cached_data is not None:
                 return cached_data
         
-        # Descargar datos
-        try:
-            logger.info(f"Descargando datos de precios para {symbol}...")
-            ticker = yf.Ticker(symbol)
-            data = ticker.history(period=period, interval=interval)
-            
-            if data.empty:
-                raise ValueError(f"No se encontraron datos para {symbol}")
-            
-            # Normalizar nombres de columnas
-            data.columns = [col.capitalize() for col in data.columns]
-            
-            # Guardar en cache
-            if use_cache:
-                self._save_to_cache(data, cache_path)
-            
-            return data
-            
-        except Exception as e:
-            logger.error(f"Error obteniendo datos de precios para {symbol}: {e}")
-            raise
+        # Intentar cargar cache antiguo si existe (aunque haya expirado)
+        if use_cache and cache_path.exists():
+            logger.warning(f"Cache expirado encontrado para {symbol}. Intentando usar datos antiguos...")
+            cached_data = self._load_from_cache(cache_path)
+            if cached_data is not None and not cached_data.empty:
+                logger.info(f"Usando datos de cache expirado para {symbol}")
+                return cached_data
+        
+        # Descargar datos con reintentos
+        last_error = None
+        for attempt in range(1, self.max_retries + 1):
+            try:
+                logger.info(f"Descargando datos de precios para {symbol} (intento {attempt}/{self.max_retries})...")
+                ticker = yf.Ticker(symbol)
+                
+                # Configurar timeout más largo para yfinance
+                data = ticker.history(period=period, interval=interval, timeout=self.timeout)
+                
+                if data.empty:
+                    raise ValueError(f"No se encontraron datos para {symbol}")
+                
+                # Normalizar nombres de columnas
+                data.columns = [col.capitalize() for col in data.columns]
+                
+                # Guardar en cache
+                if use_cache:
+                    self._save_to_cache(data, cache_path)
+                
+                logger.info(f"Datos descargados exitosamente para {symbol}")
+                return data
+                
+            except Exception as e:
+                last_error = e
+                logger.warning(f"Intento {attempt} fallido para {symbol}: {e}")
+                
+                if attempt < self.max_retries:
+                    wait_time = 2 ** attempt  # Backoff exponencial
+                    logger.info(f"Reintentando en {wait_time} segundos...")
+                    time.sleep(wait_time)
+                else:
+                    logger.error(f"Todos los intentos fallaron para {symbol}")
+        
+        # Si todos los intentos fallaron, intentar usar cache antiguo o lanzar error
+        if use_cache and cache_path.exists():
+            logger.warning(f"Usando datos de cache antiguo debido a error de red para {symbol}")
+            cached_data = self._load_from_cache(cache_path)
+            if cached_data is not None and not cached_data.empty:
+                return cached_data
+        
+        raise ConnectionError(f"Error obteniendo datos de precios para {symbol} después de {self.max_retries} intentos: {last_error}")
     
     def get_fundamental_data(self, symbol: str, use_cache: bool = True) -> Dict:
         """
@@ -147,54 +183,82 @@ class DataProvider:
             if cached_data is not None:
                 return cached_data
         
-        try:
-            logger.info(f"Descargando datos fundamentales para {symbol}...")
-            ticker = yf.Ticker(symbol)
-            
-            info = ticker.info
-            
-            # Extraer información relevante
-            fundamental_data = {
-                "symbol": symbol,
-                "name": info.get("longName", info.get("shortName", "")),
-                "sector": info.get("sector", ""),
-                "industry": info.get("industry", ""),
-                "market_cap": info.get("marketCap"),
-                "enterprise_value": info.get("enterpriseValue"),
-                "pe_ratio": info.get("trailingPE"),
-                "forward_pe": info.get("forwardPE"),
-                "peg_ratio": info.get("pegRatio"),
-                "price_to_book": info.get("priceToBook"),
-                "price_to_sales": info.get("priceToSalesTrailing12Months"),
-                "dividend_yield": info.get("dividendYield"),
-                "payout_ratio": info.get("payoutRatio"),
-                "revenue_growth": info.get("revenueGrowth"),
-                "earnings_growth": info.get("earningsGrowth"),
-                "profit_margin": info.get("profitMargins"),
-                "operating_margin": info.get("operatingMargins"),
-                "roe": info.get("returnOnEquity"),
-                "roa": info.get("returnOnAssets"),
-                "debt_to_equity": info.get("debtToEquity"),
-                "current_ratio": info.get("currentRatio"),
-                "quick_ratio": info.get("quickRatio"),
-                "beta": info.get("beta"),
-                "52_week_high": info.get("fiftyTwoWeekHigh"),
-                "52_week_low": info.get("fiftyTwoWeekLow"),
-                "current_price": info.get("currentPrice"),
-                "target_price": info.get("targetMeanPrice"),
-                "recommendation": info.get("recommendationKey", "").upper(),
-                "number_of_analysts": info.get("numberOfAnalystOpinions"),
-            }
-            
-            # Guardar en cache
-            if use_cache:
-                self._save_to_cache(fundamental_data, cache_path)
-            
-            return fundamental_data
-            
-        except Exception as e:
-            logger.error(f"Error obteniendo datos fundamentales para {symbol}: {e}")
-            raise
+        # Intentar cargar cache antiguo si existe
+        if use_cache and cache_path.exists():
+            logger.warning(f"Cache expirado encontrado para fundamentales de {symbol}. Intentando usar datos antiguos...")
+            cached_data = self._load_from_cache(cache_path)
+            if cached_data is not None:
+                logger.info(f"Usando datos de cache expirado para fundamentales de {symbol}")
+                return cached_data
+        
+        # Descargar datos con reintentos
+        last_error = None
+        for attempt in range(1, self.max_retries + 1):
+            try:
+                logger.info(f"Descargando datos fundamentales para {symbol} (intento {attempt}/{self.max_retries})...")
+                ticker = yf.Ticker(symbol)
+                
+                info = ticker.info
+                
+                # Extraer información relevante
+                fundamental_data = {
+                    "symbol": symbol,
+                    "name": info.get("longName", info.get("shortName", "")),
+                    "sector": info.get("sector", ""),
+                    "industry": info.get("industry", ""),
+                    "market_cap": info.get("marketCap"),
+                    "enterprise_value": info.get("enterpriseValue"),
+                    "pe_ratio": info.get("trailingPE"),
+                    "forward_pe": info.get("forwardPE"),
+                    "peg_ratio": info.get("pegRatio"),
+                    "price_to_book": info.get("priceToBook"),
+                    "price_to_sales": info.get("priceToSalesTrailing12Months"),
+                    "dividend_yield": info.get("dividendYield"),
+                    "payout_ratio": info.get("payoutRatio"),
+                    "revenue_growth": info.get("revenueGrowth"),
+                    "earnings_growth": info.get("earningsGrowth"),
+                    "profit_margin": info.get("profitMargins"),
+                    "operating_margin": info.get("operatingMargins"),
+                    "roe": info.get("returnOnEquity"),
+                    "roa": info.get("returnOnAssets"),
+                    "debt_to_equity": info.get("debtToEquity"),
+                    "current_ratio": info.get("currentRatio"),
+                    "quick_ratio": info.get("quickRatio"),
+                    "beta": info.get("beta"),
+                    "52_week_high": info.get("fiftyTwoWeekHigh"),
+                    "52_week_low": info.get("fiftyTwoWeekLow"),
+                    "current_price": info.get("currentPrice"),
+                    "target_price": info.get("targetMeanPrice"),
+                    "recommendation": info.get("recommendationKey", "").upper(),
+                    "number_of_analysts": info.get("numberOfAnalystOpinions"),
+                }
+                
+                # Guardar en cache
+                if use_cache:
+                    self._save_to_cache(fundamental_data, cache_path)
+                
+                logger.info(f"Datos fundamentales descargados exitosamente para {symbol}")
+                return fundamental_data
+                
+            except Exception as e:
+                last_error = e
+                logger.warning(f"Intento {attempt} fallido para fundamentales de {symbol}: {e}")
+                
+                if attempt < self.max_retries:
+                    wait_time = 2 ** attempt  # Backoff exponencial
+                    logger.info(f"Reintentando en {wait_time} segundos...")
+                    time.sleep(wait_time)
+                else:
+                    logger.error(f"Todos los intentos fallaron para fundamentales de {symbol}")
+        
+        # Si todos los intentos fallaron, intentar usar cache antiguo o lanzar error
+        if use_cache and cache_path.exists():
+            logger.warning(f"Usando datos de cache antiguo debido a error de red para fundamentales de {symbol}")
+            cached_data = self._load_from_cache(cache_path)
+            if cached_data is not None:
+                return cached_data
+        
+        raise ConnectionError(f"Error obteniendo datos fundamentales para {symbol} después de {self.max_retries} intentos: {last_error}")
     
     def get_financial_statements(
         self,
