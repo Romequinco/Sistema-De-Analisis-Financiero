@@ -208,6 +208,15 @@ format_number(500)         # "$500.00"
 
 ## [CACHE] Sistema de Cache
 
+```mermaid
+flowchart TD
+    A[Solicitud de datos] --> B{Cache valido?}
+    B -- Si --> C[Retornar cache]
+    B -- No --> D[Descargar datos]
+    D --> E[Guardar cache]
+    E --> C
+```
+
 El módulo implementa un sistema de cache local para:
 
 - Reducir llamadas a APIs externas

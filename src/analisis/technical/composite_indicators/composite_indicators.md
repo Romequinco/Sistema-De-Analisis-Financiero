@@ -6,6 +6,14 @@ Este módulo contiene **indicadores compuestos avanzados** que combinan múltipl
 
 A diferencia de los indicadores básicos que miden un aspecto específico (tendencia, momentum, volatilidad), los indicadores compuestos integran múltiples elementos para ofrecer una visión más holística del mercado.
 
+```mermaid
+flowchart TB
+    A[Indicadores compuestos] --> B[MACD]
+    A --> C[Ichimoku]
+    A --> D[SuperTrend]
+    A --> E[Adaptive MA]
+```
+
 ---
 
 ## [DIFERENCIA] Diferencia con Indicadores Básicos

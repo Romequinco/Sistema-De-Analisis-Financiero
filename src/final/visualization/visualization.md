@@ -26,6 +26,15 @@ Módulo en desarrollo inicial. Pendiente de implementación.
 
 ## [ARQUITECTURA] Arquitectura del Módulo
 
+```mermaid
+flowchart TB
+    A[VisualizationEngine] --> B[Price Charts]
+    A --> C[Score Visualization]
+    A --> D[Tables]
+    A --> E[Reports]
+    A --> F[Styling]
+```
+
 ```
 VisualizationEngine
 ├── Price Charts

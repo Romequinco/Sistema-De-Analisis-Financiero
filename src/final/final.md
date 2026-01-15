@@ -51,6 +51,14 @@ Motor de visualización y generación de reportes.
 
 ## [FLUJO] Flujo de Datos
 
+```mermaid
+flowchart TD
+    A[Score unificado] --> B[Decision Engine]
+    B --> C[Clasificacion + Explicacion]
+    C --> D[Visualization Engine]
+    D --> E[Reportes y graficos]
+```
+
 ```
 Score Unificado + Breakdown (del módulo scoring)
     ↓

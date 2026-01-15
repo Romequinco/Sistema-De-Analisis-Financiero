@@ -7,6 +7,14 @@
 ## [OBJETIVO] Objetivo
 Convertir múltiples señales heterogéneas en un **score unificado, normalizado y explicable**.
 
+```mermaid
+flowchart TD
+    A[Senales individuales] --> B[Scores por estrategia]
+    B --> C[Scores por bloque]
+    C --> D[Score total]
+    D --> E[Clasificacion discreta]
+```
+
 ---
 
 ## 1. Nivel 1: Señales individuales

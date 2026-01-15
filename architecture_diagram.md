@@ -70,6 +70,12 @@ style I fill:#0070C0,stroke:#333,stroke-width:2px,color:#fff
 
 ## [ESTADO] Estado de Implementación
 
+```mermaid
+flowchart LR
+    A[Data<br/>COMPLETADO] --> B[Analisis<br/>PENDIENTE]
+    B --> C[Final<br/>PENDIENTE]
+```
+
 ### [COMPLETADO]
 - Data Provider (`src/data/raw/`) con cache y manejo de errores
 - Data Cleaner (`src/data/cleaning/`) para limpieza y preprocesamiento

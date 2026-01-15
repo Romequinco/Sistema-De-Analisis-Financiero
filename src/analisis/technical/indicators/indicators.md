@@ -8,6 +8,15 @@ Este módulo contiene **indicadores técnicos básicos** organizados por categor
 
 ## [ESTRUCTURA] Estructura del Módulo
 
+```mermaid
+flowchart TB
+    A[indicators/] --> B[trend.py]
+    A --> C[momentum.py]
+    A --> D[volatility.py]
+    A --> E[volume.py]
+    A --> F[price_action.py]
+```
+
 ```
 indicators/
 ├── trend.py          Indicadores de tendencia

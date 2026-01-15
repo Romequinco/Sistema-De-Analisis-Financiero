@@ -64,6 +64,14 @@ print(metadata.summary())
 
 ## [FLUJO] Flujo de Datos
 
+```mermaid
+flowchart TD
+    A[DataProvider] --> B[Datos crudos]
+    B --> C[DataCleaner]
+    C --> D[Datos limpios]
+    D --> E[Modulos de analisis]
+```
+
 ```
 DataProvider (raw)
     ↓

@@ -48,6 +48,13 @@ Este módulo se encarga de **limpiar, normalizar y validar** datos financieros o
 
 ## [ARQUITECTURA] Arquitectura del Módulo
 
+```mermaid
+flowchart TB
+    A[DataCleaner] --> B[clean_price_data]
+    A --> C[clean_fundamental_data]
+    A --> D[clean_financial_statement]
+```
+
 ```
 DataCleaner
 ├── clean_price_data()

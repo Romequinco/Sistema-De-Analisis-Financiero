@@ -29,6 +29,14 @@ Ver `scoring_system.md` en la raíz del proyecto para detalles completos del dis
 
 ### Niveles de Agregación
 
+```mermaid
+flowchart TD
+    A[Senales individuales] --> B[Scores por estrategia]
+    B --> C[Scores por bloque]
+    C --> D[Score total]
+    D --> E[Clasificacion discreta]
+```
+
 ```
 Nivel 1: Señales Individuales
     ↓

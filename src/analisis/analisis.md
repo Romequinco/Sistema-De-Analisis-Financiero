@@ -62,6 +62,16 @@ Sistema de scoring unificado que combina señales técnicas y fundamentales.
 
 ## [FLUJO] Flujo de Datos
 
+```mermaid
+flowchart TD
+    A[Datos limpios] --> B[Analisis tecnico]
+    A --> C[Analisis fundamental]
+    B --> D[Scoring Engine]
+    C --> D
+    D --> E[Score unificado]
+    E --> F[Decision]
+```
+
 ```
 Datos Limpios (OHLCV + Fundamentales)
     ↓

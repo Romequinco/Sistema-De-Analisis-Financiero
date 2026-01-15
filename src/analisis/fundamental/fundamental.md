@@ -25,6 +25,15 @@ Módulo en desarrollo inicial. Pendiente de implementación.
 
 ## [ARQUITECTURA] Arquitectura del Módulo
 
+```mermaid
+flowchart TB
+    A[FundamentalAnalyzer] --> B[Value]
+    A --> C[Growth]
+    A --> D[Quality]
+    A --> E[Health]
+    A --> F[Mixed]
+```
+
 ```
 FundamentalAnalyzer
 ├── Value Investing

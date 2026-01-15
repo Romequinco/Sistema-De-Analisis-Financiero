@@ -8,6 +8,13 @@
 
 Este módulo maneja la configuración del sistema, incluyendo parámetros, pesos y ajustes.
 
+```mermaid
+flowchart LR
+    A[Archivos YAML/JSON] --> B[Validacion]
+    B --> C[Configuracion efectiva]
+    C --> D[Modulos del sistema]
+```
+
 ## [ESTADO] Estado Actual
 
 Módulo en desarrollo inicial. Pendiente de implementación.

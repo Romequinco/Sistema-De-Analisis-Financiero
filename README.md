@@ -33,6 +33,16 @@ El sistema sigue un pipeline claro:
 5. Motor de decisión
 6. Visualización y reporting
 
+```mermaid
+flowchart LR
+    A[Extraccion de datos] --> B[Analisis tecnico]
+    A --> C[Analisis fundamental]
+    B --> D[Sistema de scoring]
+    C --> D
+    D --> E[Motor de decision]
+    E --> F[Visualizacion y reporting]
+```
+
 Cada paso es independiente, testeable y reemplazable.
 
 ---

@@ -8,6 +8,14 @@
 
 Este módulo contiene funciones auxiliares y utilidades compartidas por otros módulos.
 
+```mermaid
+flowchart LR
+    A[Utils] --> B[Data]
+    A --> C[Analisis]
+    A --> D[Scoring]
+    A --> E[Final]
+```
+
 ## [ESTADO] Estado Actual
 
 Módulo en desarrollo inicial. Pendiente de implementación.

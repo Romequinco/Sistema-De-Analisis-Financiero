@@ -39,6 +39,14 @@ Es importante reconocer las limitaciones:
 
 ## [ESTRUCTURA] Estructura del Módulo
 
+```mermaid
+flowchart TB
+    A[technical/] --> B[indicators/]
+    A --> C[composite_indicators/]
+    A --> D[notebooks/]
+    A --> E[technical.md]
+```
+
 ```
 src/analisis/technical/
 ├── indicators/              Indicadores básicos por categoría

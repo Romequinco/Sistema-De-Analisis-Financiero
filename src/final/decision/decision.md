@@ -25,6 +25,14 @@ Módulo en desarrollo inicial. Pendiente de implementación.
 
 ## [ARQUITECTURA] Arquitectura del Módulo
 
+```mermaid
+flowchart TB
+    A[DecisionEngine] --> B[Classification]
+    A --> C[Explanation]
+    A --> D[Recommendation]
+    A --> E[Output Formatting]
+```
+
 ```
 DecisionEngine
 ├── Classification
