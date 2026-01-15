@@ -1,30 +1,15 @@
-# [UTILS] Módulo de Utilidades
+# Modulo de Utilidades
 
-## [UBICACION] Ubicación
+## Objetivo
+Funciones auxiliares compartidas por los modulos.
 
-`src/utils/`
+## Que hace
+| Aspecto | Descripcion |
+| --- | --- |
+| Entradas | Datos y parametros varios |
+| Salidas | Helpers reutilizables |
+| Estado | Pendiente de implementacion |
 
-## [OBJETIVO] Objetivo
-
-Este módulo contiene funciones auxiliares y utilidades compartidas por otros módulos.
-
-```mermaid
-flowchart LR
-    A[Utils] --> B[Data]
-    A --> C[Analisis]
-    A --> D[Scoring]
-    A --> E[Final]
-```
-
-## [ESTADO] Estado Actual
-
-Módulo en desarrollo inicial. Pendiente de implementación.
-
-## [PLANIFICADO] Funcionalidades Planificadas
-
-- Funciones de normalización de datos
-- Helpers de manejo de fechas
-- Validación de datos financieros
-- Formateo de números y monedas
-- Helpers de logging
-- Funciones de conversión de tipos
+## Referencias
+- Data: `src/data/data.md`
+- Analisis: `src/analisis/analisis.md`
