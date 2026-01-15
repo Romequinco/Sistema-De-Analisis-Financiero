@@ -14,6 +14,12 @@ Convertir el score en decision y visualizaciones consumibles.
 - `decision/` clasificacion y recomendaciones
 - `visualization/` graficos y reportes
 
+## Funciones clave (resumen)
+| Modulo | Funcion |
+| --- | --- |
+| Decision | Clasificar y explicar |
+| Visualization | Graficar y reportar |
+
 ## Flujo
 ```mermaid
 flowchart LR

@@ -18,5 +18,13 @@ Indicadores compuestos que agregan multiples señales en un solo calculo.
 | SuperTrend | Tendencia adaptativa | Linea y direccion |
 | Adaptive MA | Media movil adaptativa | Columna MA adaptativa |
 
+## Funciones clave
+| Funcion | Descripcion |
+| --- | --- |
+| `calculate_macd` | MACD |
+| `calculate_ichimoku` | Ichimoku |
+| `calculate_supertrend` | SuperTrend |
+| `calculate_adaptive_ma` | Adaptive MA |
+
 ## Referencias
 - Indicadores basicos: `../indicators/indicators.md`

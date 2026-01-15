@@ -24,5 +24,13 @@ flowchart TD
 - Agregacion por estrategia y bloque
 - Pesos configurables
 
+## Funciones clave (planificado)
+| Funcion | Descripcion |
+| --- | --- |
+| Normalizar señales | Validar rango [-1, +1] |
+| Agregar estrategias | Score por estrategia |
+| Agregar bloques | Score tecnico/fundamental |
+| Clasificar | Mapear score a clase |
+
 ## Referencias
 - Diseño completo: `scoring_system.md`

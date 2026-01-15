@@ -16,6 +16,17 @@ Proveer datos de mercado y fundamentales con cache local.
 | Inputs | `symbol`, `period`, `interval` |
 | Outputs | `price_data`, `fundamental_data`, `financial_statements` |
 
+## Funciones clave
+| Funcion | Descripcion |
+| --- | --- |
+| `DataProvider.get_price_data` | Precios OHLCV |
+| `DataProvider.get_fundamental_data` | Metricas fundamentales |
+| `DataProvider.get_financial_statements` | Estados financieros |
+| `DataProvider.get_all_data` | Paquete completo de datos |
+| `DataProvider.clear_cache` | Limpieza de cache |
+| `get_data` | Acceso rapido a `get_all_data` |
+| `format_number` | Formateo numerico |
+
 ## Flujo de cache
 ```mermaid
 flowchart TD

@@ -15,6 +15,13 @@ Convertir datos limpios en señales normalizadas para el scoring.
 - `fundamental/` analisis fundamental
 - `scoring/` agregacion y scoring
 
+## Funciones clave (resumen)
+| Modulo | Funcion |
+| --- | --- |
+| Tecnico | Calculo de indicadores |
+| Fundamental | Calculo de señales por estrategia |
+| Scoring | Agregacion y clasificacion |
+
 ## Flujo
 ```mermaid
 flowchart TD

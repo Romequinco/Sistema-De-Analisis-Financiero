@@ -17,6 +17,15 @@ Catalogo de indicadores basicos disponibles y sus parametros clave.
 - `volume.py`
 - `price_action.py`
 
+## Funciones clave (resumen)
+| Archivo | Funciones |
+| --- | --- |
+| `trend.py` | `calculate_sma`, `calculate_ema`, `calculate_sma_series`, `calculate_ema_series`, `calculate_parabolic_sar` |
+| `momentum.py` | `calculate_rsi`, `calculate_adx`, `calculate_stochastic_rsi` |
+| `volatility.py` | `calculate_atr`, `calculate_bollinger_bands` |
+| `volume.py` | `calculate_volume_indicators`, `calculate_vwap`, `calculate_mfi`, `calculate_market_profile`, `calculate_volume_profile` |
+| `price_action.py` | `calculate_fractals`, `identify_wyckoff_phases` |
+
 ## Indicadores (resumen)
 | Categoria | Indicadores | Parametros relevantes |
 | --- | --- | --- |

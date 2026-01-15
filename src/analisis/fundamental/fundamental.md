@@ -19,6 +19,15 @@ Evaluar valor, crecimiento, calidad y salud financiera para generar señales.
 | Health | Deuda y liquidez |
 | Mixtas | Combinaciones Value/Growth/Quality |
 
+## Funciones clave (planificado)
+| Funcion | Descripcion |
+| --- | --- |
+| Value | Señales de valoracion |
+| Growth | Señales de crecimiento |
+| Quality | Señales de calidad |
+| Health | Señales de salud financiera |
+| Mixtas | Señales combinadas |
+
 ## Flujo
 ```mermaid
 flowchart TB

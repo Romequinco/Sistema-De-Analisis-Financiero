@@ -14,6 +14,12 @@ Extraer y preparar datos financieros para el pipeline.
 - `raw/` extraccion y cache
 - `cleaning/` limpieza y normalizacion
 
+## Funciones clave (resumen)
+| Funcion | Descripcion |
+| --- | --- |
+| `DataProvider.*` | Extraccion y cache |
+| `DataCleaner.*` | Limpieza y validacion |
+
 ## Flujo
 ```mermaid
 flowchart LR

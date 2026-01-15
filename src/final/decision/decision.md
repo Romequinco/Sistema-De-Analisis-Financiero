@@ -10,6 +10,13 @@ Transformar el score en clasificacion, explicacion y recomendacion.
 | Salidas | Clasificacion, explicacion, recomendacion |
 | Estado | Pendiente de implementacion |
 
+## Funciones clave (planificado)
+| Funcion | Descripcion |
+| --- | --- |
+| Clasificar | Asignar clase por umbral |
+| Explicar | Resumen y factores clave |
+| Recomendar | Accion sugerida |
+
 ## Clasificacion
 | Rango score | Clase |
 | --- | --- |
