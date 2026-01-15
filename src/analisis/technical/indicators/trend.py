@@ -12,7 +12,9 @@ Indicadores implementados:
 
 import pandas as pd
 import numpy as np
-from typing import Optional
+from typing import Iterable, Optional, Tuple
+
+DEFAULT_MA_PERIODS: Tuple[int, int, int] = (8, 18, 40)
 
 
 def calculate_sma(df: pd.DataFrame, 
@@ -36,8 +38,8 @@ def calculate_sma(df: pd.DataFrame,
         DataFrame con una nueva columna 'SMA_{period}' o el nombre especificado.
     
     Ejemplo:
-        >>> df = calculate_sma(df, period=50)
-        >>> df['SMA_50']  # Acceder a la SMA de 50 períodos
+        >>> df = calculate_sma(df, period=18)
+        >>> df['SMA_18']  # Acceder a la SMA de 18 períodos
     """
     df = df.copy()
     
@@ -77,8 +79,8 @@ def calculate_ema(df: pd.DataFrame,
         DataFrame con una nueva columna 'EMA_{period}' o el nombre especificado.
     
     Ejemplo:
-        >>> df = calculate_ema(df, period=12)
-        >>> df['EMA_12']  # Acceder a la EMA de 12 períodos
+        >>> df = calculate_ema(df, period=18)
+        >>> df['EMA_18']  # Acceder a la EMA de 18 períodos
     """
     df = df.copy()
     
@@ -94,6 +96,64 @@ def calculate_ema(df: pd.DataFrame,
     # Calcular EMA usando pandas (método exponencial)
     df[output_column] = df[column].ewm(span=period, adjust=False, min_periods=1).mean()
     
+    return df
+
+
+def calculate_sma_series(df: pd.DataFrame,
+                         column: str = 'close',
+                         periods: Iterable[int] = DEFAULT_MA_PERIODS,
+                         output_prefix: str = 'SMA') -> pd.DataFrame:
+    """
+    Calcula múltiples SMAs para una lista de períodos.
+
+    Args:
+        df: DataFrame con datos OHLCV. Debe tener columna 'close' o la especificada.
+        column: Nombre de la columna de precio a usar (default: 'close').
+        periods: Períodos a calcular (default: 8, 18, 40).
+        output_prefix: Prefijo para columnas de salida (default: 'SMA').
+
+    Returns:
+        DataFrame con nuevas columnas SMA por período.
+    """
+    df = df.copy()
+
+    column = column.lower()
+    if column not in df.columns:
+        raise ValueError(f"Columna '{column}' no encontrada en el DataFrame")
+
+    for period in periods:
+        output_column = f'{output_prefix}_{period}'
+        df[output_column] = df[column].rolling(window=period, min_periods=1).mean()
+
+    return df
+
+
+def calculate_ema_series(df: pd.DataFrame,
+                         column: str = 'close',
+                         periods: Iterable[int] = DEFAULT_MA_PERIODS,
+                         output_prefix: str = 'EMA') -> pd.DataFrame:
+    """
+    Calcula múltiples EMAs para una lista de períodos.
+
+    Args:
+        df: DataFrame con datos OHLCV. Debe tener columna 'close' o la especificada.
+        column: Nombre de la columna de precio a usar (default: 'close').
+        periods: Períodos a calcular (default: 8, 18, 40).
+        output_prefix: Prefijo para columnas de salida (default: 'EMA').
+
+    Returns:
+        DataFrame con nuevas columnas EMA por período.
+    """
+    df = df.copy()
+
+    column = column.lower()
+    if column not in df.columns:
+        raise ValueError(f"Columna '{column}' no encontrada en el DataFrame")
+
+    for period in periods:
+        output_column = f'{output_prefix}_{period}'
+        df[output_column] = df[column].ewm(span=period, adjust=False, min_periods=1).mean()
+
     return df
 
 

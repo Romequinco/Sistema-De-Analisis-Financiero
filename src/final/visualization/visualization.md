@@ -75,7 +75,7 @@ Visualización de precios OHLC con estilo profesional:
 chart = create_candlestick_chart(
     price_data=price_data,
     title="AAPL - Precios Históricos",
-    indicators=['SMA_50', 'SMA_200', 'Bollinger_Bands']
+    indicators=['SMA_8', 'SMA_18', 'SMA_40', 'Bollinger_Bands']
 )
 ```
 
@@ -93,7 +93,7 @@ Para visualización más simple:
 chart = create_line_chart(
     price_data=price_data['Close'],
     title="AAPL - Precio de Cierre",
-    indicators=['SMA_50', 'EMA_20']
+    indicators=['SMA_18', 'EMA_18']
 )
 ```
 
@@ -278,7 +278,7 @@ viz = VisualizationEngine(
 price_chart = viz.create_price_chart(
     price_data=price_data,
     symbol='AAPL',
-    indicators=['SMA_50', 'RSI']
+    indicators=['SMA_18', 'RSI']
 )
 
 # Gráfico de score
@@ -427,7 +427,7 @@ dashboard = viz.create_dashboard(
 │       │ ╱    ╲╲    ╱╲                  │
 │  $160 ┤╱      ╲╲  ╱  ╲                  │
 │       └────────┴──┴────┴─────────────   │
-│         SMA_50  SMA_200  Precio         │
+│        SMA_8  SMA_18  SMA_40  Precio     │
 │                                         │
 │  Vol ┤███████████████████████████████  │
 │       └───────────────────────────────  │

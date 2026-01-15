@@ -153,7 +153,7 @@ cleaner = DataCleaner()
 cleaned_data, metadata = cleaner.clean_price_data(raw_data)
 
 # Calcular indicadores
-df = trend.calculate_sma(cleaned_data, period=20)
+df = trend.calculate_sma_series(cleaned_data)
 df = momentum.calculate_rsi(df, period=14)
 ```
 
@@ -208,10 +208,10 @@ Todos los indicadores siguen el mismo patrón:
 from src.analisis.technical.indicators import trend, momentum
 
 # 2. Calcular indicador (añade columnas al DataFrame)
-df = trend.calculate_sma(df, period=20)
+df = trend.calculate_sma_series(df)
 
 # 3. Acceder a resultados
-df['SMA_20']  # Columna con la SMA
+df['SMA_8']  # Columna con la SMA de corto plazo
 ```
 
 ### Combinación de Indicadores
@@ -221,8 +221,8 @@ from src.analisis.technical.indicators import trend, momentum, volatility, volum
 from src.analisis.technical.composite_indicators import macd
 
 # Calcular múltiples indicadores
-df = trend.calculate_sma(df, period=50)
-df = trend.calculate_ema(df, period=20)
+df = trend.calculate_sma_series(df)
+df = trend.calculate_ema_series(df)
 df = momentum.calculate_rsi(df, period=14)
 df = volatility.calculate_bollinger_bands(df, period=20)
 df = volume.calculate_vwap(df)
@@ -237,7 +237,7 @@ Todos los indicadores tienen parámetros configurables:
 
 ```python
 # SMA con período personalizado
-df = trend.calculate_sma(df, period=50)
+df = trend.calculate_sma(df, period=18)
 
 # RSI con período y nombre de columna personalizados
 df = momentum.calculate_rsi(df, period=21, output_column='RSI_Long')
@@ -272,7 +272,7 @@ Antes de usar en trading real, validar con datos históricos (backtesting).
 ### 4. Ajustar parámetros según activo
 
 Diferentes activos pueden requerir diferentes parámetros:
-- Acciones: RSI 14, SMA 20/50
+- Acciones: RSI 14, SMA 8/18/40
 - Criptomonedas: Puede requerir períodos más cortos
 - Forex: Puede requerir períodos más largos
 

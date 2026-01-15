@@ -41,6 +41,11 @@ indicators/
 - Como referencia para cruces de medias
 - Como nivel de soporte/resistencia dinámico
 
+**Configuración recomendada**:
+- SMA 8 (corto plazo)
+- SMA 18 (medio plazo)
+- SMA 40 (largo plazo)
+
 **Ventajas**:
 - Simple y fácil de interpretar
 - Ampliamente utilizado y reconocido
@@ -72,6 +77,11 @@ Si el precio de una acción es $100, $102, $98, $105, $103 en 5 días, la SMA de
 - En mercados volátiles donde se necesita sensibilidad
 - Para estrategias de seguimiento de tendencia de corto plazo
 
+**Configuración recomendada**:
+- EMA 8 (corto plazo)
+- EMA 18 (medio plazo)
+- EMA 40 (largo plazo)
+
 **Ventajas**:
 - Más sensible a cambios recientes
 - Menor retraso que SMA
@@ -88,7 +98,7 @@ Si el precio de una acción es $100, $102, $98, $105, $103 en 5 días, la SMA de
 - Cruce de EMA rápida por debajo de lenta: Señal bajista
 
 **Ejemplo conceptual**:
-Si una EMA de 12 períodos está en $100 y el precio sube a $105, la EMA se moverá más rápido hacia $105 que una SMA equivalente, dando una señal más temprana de cambio de tendencia.
+Si una EMA de 8 períodos está en $100 y el precio sube a $105, la EMA se moverá más rápido hacia $105 que una SMA equivalente, dando una señal más temprana de cambio de tendencia.
 
 ---
 
@@ -504,12 +514,12 @@ Todos los indicadores siguen el mismo patrón:
 from src.analisis.technical.indicators import trend, momentum, volatility, volume, price_action
 
 # Calcular indicador
-df = trend.calculate_sma(df, period=20)
+df = trend.calculate_sma_series(df)
 df = momentum.calculate_rsi(df, period=14)
 df = volatility.calculate_bollinger_bands(df, period=20, std_dev=2)
 
 # Acceder a resultados
-df['SMA_20']  # Media móvil simple
+df['SMA_8']  # Media móvil simple
 df['RSI_14']  # RSI
 df['BB_20_Upper']  # Banda superior de Bollinger
 ```
