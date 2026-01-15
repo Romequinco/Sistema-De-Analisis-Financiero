@@ -8,8 +8,7 @@ Indicadores implementados:
 - Volume: Análisis básico de volumen
 - VWAP: Volume Weighted Average Price
 - MFI: Money Flow Index
-- Market Profile: Perfil de mercado (distribución de precio-tiempo)
-- Volume Profile: Perfil de volumen (distribución de precio-volumen)
+- A/D: Accumulation/Distribution Line
 """
 
 import pandas as pd
@@ -201,230 +200,30 @@ def calculate_mfi(df: pd.DataFrame,
     return df
 
 
-def calculate_market_profile(df: pd.DataFrame,
-                            bins: int = 30,
-                            output_prefix: str = 'Market_Profile') -> pd.DataFrame:
+def calculate_ad(df: pd.DataFrame,
+                 output_column: str = 'AD') -> pd.DataFrame:
     """
-    Calcula el Market Profile básico (distribución precio-tiempo).
-    
-    El Market Profile muestra cómo se distribuye el precio a lo largo del tiempo,
-    identificando áreas de alta y baja actividad (POC - Point of Control,
-    Value Area).
-    
-    NOTA: Esta es una implementación simplificada. El Market Profile completo
-    requiere análisis de TPOs (Time Price Opportunities) y sesiones de trading.
-    
-    Esta implementación calcula:
-    - Distribución de precios en bins
-    - POC (Point of Control): Precio con mayor frecuencia
-    - Value Area: Rango de precios que contiene el 70% del volumen
-    
-    Args:
-        df: DataFrame con datos OHLCV. Debe tener columna 'close'.
-            El índice debe ser DatetimeIndex para análisis temporal.
-        bins: Número de bins para la distribución (default: 30).
-        output_prefix: Prefijo para las columnas de salida (default: 'Market_Profile').
-            Se crearán:
-            - {prefix}_POC: Point of Control (precio más frecuente)
-            - {prefix}_Value_High: Parte superior del Value Area
-            - {prefix}_Value_Low: Parte inferior del Value Area
-    
-    Returns:
-        DataFrame con nuevas columnas para Market Profile.
-    
-    Ejemplo:
-        >>> df = calculate_market_profile(df)
-        >>> df['Market_Profile_POC']  # Point of Control
+    Calcula Accumulation/Distribution Line (A/D).
+
+    Implementación clásica sin parámetros libres.
     """
     df = df.copy()
-    
-    # Validar columna de cierre
-    if 'close' not in df.columns:
-        raise ValueError("Columna 'close' no encontrada en el DataFrame")
-    
-    # Calcular distribución de precios usando histograma
-    price_min = df['close'].min()
-    price_max = df['close'].max()
-    price_range = price_max - price_min
-    
-    if price_range == 0:
-        # Todos los precios son iguales
-        df[f'{output_prefix}_POC'] = df['close'].iloc[0]
-        df[f'{output_prefix}_Value_High'] = df['close'].iloc[0]
-        df[f'{output_prefix}_Value_Low'] = df['close'].iloc[0]
-        return df
-    
-    # Crear bins
-    bin_edges = np.linspace(price_min, price_max, bins + 1)
-    bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
-    
-    # Calcular frecuencia por bin (usando ventana móvil)
-    window_size = min(20, len(df) // 2)  # Ventana adaptativa
-    
-    poc_values = []
-    value_high_values = []
-    value_low_values = []
-    
-    for i in range(len(df)):
-        if i < window_size:
-            window_data = df['close'].iloc[:i+1]
-        else:
-            window_data = df['close'].iloc[i-window_size+1:i+1]
-        
-        # Histograma de la ventana
-        hist, _ = np.histogram(window_data, bins=bin_edges)
-        
-        # POC: bin con mayor frecuencia
-        max_idx = np.argmax(hist)
-        poc = bin_centers[max_idx]
-        
-        # Value Area: 70% del volumen
-        total_volume = hist.sum()
-        if total_volume > 0:
-            target_volume = total_volume * 0.70
-            cumsum = np.cumsum(hist)
-            value_area_mask = cumsum <= target_volume
-            
-            if value_area_mask.any():
-                value_indices = np.where(value_area_mask)[0]
-                value_low = bin_centers[value_indices[0]]
-                value_high = bin_centers[value_indices[-1]]
-            else:
-                value_low = poc
-                value_high = poc
-        else:
-            value_low = poc
-            value_high = poc
-        
-        poc_values.append(poc)
-        value_high_values.append(value_high)
-        value_low_values.append(value_low)
-    
-    # Añadir al DataFrame
-    df[f'{output_prefix}_POC'] = poc_values
-    df[f'{output_prefix}_Value_High'] = value_high_values
-    df[f'{output_prefix}_Value_Low'] = value_low_values
-    
-    return df
 
-
-def calculate_volume_profile(df: pd.DataFrame,
-                            bins: int = 30,
-                            output_prefix: str = 'Volume_Profile') -> pd.DataFrame:
-    """
-    Calcula el Volume Profile (distribución precio-volumen).
-    
-    El Volume Profile muestra cómo se distribuye el volumen a través
-    de diferentes niveles de precio, identificando áreas de alta y baja
-    actividad de volumen.
-    
-    Conceptos clave:
-    - POC (Point of Control): Nivel de precio con mayor volumen
-    - Value Area: Rango de precios que contiene el 70% del volumen
-    - High Volume Nodes: Áreas de alta actividad (soportes/resistencias)
-    - Low Volume Nodes: Áreas de baja actividad (zonas de ruptura)
-    
-    Args:
-        df: DataFrame con datos OHLCV. Debe tener columnas 'high', 'low', 'close', 'volume'.
-        bins: Número de bins para la distribución de precios (default: 30).
-        output_prefix: Prefijo para las columnas de salida (default: 'Volume_Profile').
-            Se crearán:
-            - {prefix}_POC: Point of Control (precio con mayor volumen)
-            - {prefix}_Value_High: Parte superior del Value Area
-            - {prefix}_Value_Low: Parte inferior del Value Area
-            - {prefix}_Volume_Density: Densidad de volumen normalizada
-    
-    Returns:
-        DataFrame con nuevas columnas para Volume Profile.
-    
-    Ejemplo:
-        >>> df = calculate_volume_profile(df)
-        >>> df['Volume_Profile_POC']  # Point of Control
-    """
-    df = df.copy()
-    
-    # Validar columnas requeridas
     required_cols = ['high', 'low', 'close', 'volume']
     for col in required_cols:
         if col not in df.columns:
             raise ValueError(f"Columna '{col}' no encontrada en el DataFrame")
-    
-    # Calcular rango de precios
-    price_min = df[['high', 'low']].min().min()
-    price_max = df[['high', 'low']].max().max()
-    price_range = price_max - price_min
-    
-    if price_range == 0:
-        # Todos los precios son iguales
-        df[f'{output_prefix}_POC'] = df['close'].iloc[0]
-        df[f'{output_prefix}_Value_High'] = df['close'].iloc[0]
-        df[f'{output_prefix}_Value_Low'] = df['close'].iloc[0]
-        df[f'{output_prefix}_Volume_Density'] = 1.0
-        return df
-    
-    # Crear bins
-    bin_edges = np.linspace(price_min, price_max, bins + 1)
-    bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
-    
-    # Calcular Volume Profile usando ventana móvil
-    window_size = min(20, len(df) // 2)  # Ventana adaptativa
-    
-    poc_values = []
-    value_high_values = []
-    value_low_values = []
-    density_values = []
-    
-    for i in range(len(df)):
-        if i < window_size:
-            window_data = df.iloc[:i+1]
-        else:
-            window_data = df.iloc[i-window_size+1:i+1]
-        
-        # Distribuir volumen por bins según precio típico
-        typical_prices = (window_data['high'] + window_data['low'] + window_data['close']) / 3
-        volumes = window_data['volume'].values
-        
-        # Crear histograma ponderado por volumen
-        volume_profile, _ = np.histogram(typical_prices, bins=bin_edges, weights=volumes)
-        
-        # POC: bin con mayor volumen
-        max_idx = np.argmax(volume_profile)
-        poc = bin_centers[max_idx]
-        
-        # Value Area: 70% del volumen total
-        total_volume = volume_profile.sum()
-        if total_volume > 0:
-            target_volume = total_volume * 0.70
-            cumsum = np.cumsum(volume_profile)
-            value_area_mask = cumsum <= target_volume
-            
-            if value_area_mask.any():
-                value_indices = np.where(value_area_mask)[0]
-                value_low = bin_centers[value_indices[0]]
-                value_high = bin_centers[value_indices[-1]]
-            else:
-                value_low = poc
-                value_high = poc
-            
-            # Densidad de volumen normalizada para el precio actual
-            current_price = df['close'].iloc[i]
-            price_bin_idx = np.digitize(current_price, bin_edges) - 1
-            price_bin_idx = max(0, min(price_bin_idx, len(volume_profile) - 1))
-            density = volume_profile[price_bin_idx] / total_volume if total_volume > 0 else 0
-        else:
-            value_low = poc
-            value_high = poc
-            density = 0
-        
-        poc_values.append(poc)
-        value_high_values.append(value_high)
-        value_low_values.append(value_low)
-        density_values.append(density)
-    
-    # Añadir al DataFrame
-    df[f'{output_prefix}_POC'] = poc_values
-    df[f'{output_prefix}_Value_High'] = value_high_values
-    df[f'{output_prefix}_Value_Low'] = value_low_values
-    df[f'{output_prefix}_Volume_Density'] = density_values
-    
+
+    high = df['high']
+    low = df['low']
+    close = df['close']
+    volume = df['volume']
+
+    price_range = (high - low).replace(0, np.nan)
+    mfm = ((close - low) - (high - close)) / price_range
+    mfm = mfm.fillna(0.0)
+    mfv = mfm * volume
+
+    df[output_column] = mfv.cumsum()
+
     return df

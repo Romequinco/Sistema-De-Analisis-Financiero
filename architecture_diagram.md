@@ -16,6 +16,7 @@ flowchart TD
 
     Tech --> Indicators[src/analisis/technical/indicators]
     Tech --> Composite[src/analisis/technical/composite_indicators]
+    Tech -.-> Experimental[src/analisis/technical/experimental]
 
     Fund --> Value[Value]
     Fund --> Growth[Growth]
@@ -46,6 +47,7 @@ flowchart TD
     Notebooks[notebooks/*.ipynb] --> DataRaw
     Notebooks --> DataClean
     Notebooks --> Tech
+    Notebooks -.-> Experimental
 ```
 
 ## Referencias

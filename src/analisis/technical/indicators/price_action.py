@@ -6,12 +6,12 @@ y patrones de mercado.
 
 Indicadores implementados:
 - Fractales: Identificación de máximos y mínimos locales
-- Wyckoff: Conceptos básicos (análisis conceptual, no automático)
+- Support/Resistance: niveles por swings
+- Pivot Points: niveles clásicos
 """
 
 import pandas as pd
 import numpy as np
-from typing import Optional
 
 
 def calculate_fractals(df: pd.DataFrame,
@@ -88,86 +88,60 @@ def calculate_fractals(df: pd.DataFrame,
     return df
 
 
-def identify_wyckoff_phases(df: pd.DataFrame,
-                            output_column: str = 'Wyckoff_Phase') -> pd.DataFrame:
+def calculate_support_resistance(df: pd.DataFrame,
+                                 lookback: int = 2,
+                                 output_prefix: str = 'SR') -> pd.DataFrame:
     """
-    Identifica fases básicas del método Wyckoff (conceptual).
-    
-    NOTA: Esta es una implementación simplificada y conceptual.
-    El análisis Wyckoff completo requiere interpretación manual
-    y análisis de múltiples factores (precio, volumen, tiempo).
-    
-    Las fases identificadas son:
-    - 'Accumulation': Acumulación (fase inicial de compra institucional)
-    - 'Markup': Subida (tendencia alcista)
-    - 'Distribution': Distribución (fase inicial de venta institucional)
-    - 'Markdown': Bajada (tendencia bajista)
-    - 'Unknown': No determinado
-    
-    Esta función usa heurísticas simples basadas en:
-    - Tendencia de precio
-    - Volumen relativo
-    - Volatilidad
-    
-    Args:
-        df: DataFrame con datos OHLCV. Debe tener columnas 'high', 'low', 'close', 'volume'.
-        output_column: Nombre de la columna de salida (default: 'Wyckoff_Phase').
-    
-    Returns:
-        DataFrame con una nueva columna 'Wyckoff_Phase' con valores categóricos.
-    
-    Ejemplo:
-        >>> df = identify_wyckoff_phases(df)
-        >>> df['Wyckoff_Phase']  # Fase identificada
+    Calcula soporte y resistencia basados en swings.
     """
     df = df.copy()
-    
-    # Validar columnas requeridas
-    required_cols = ['high', 'low', 'close', 'volume']
+
+    required_cols = ['high', 'low']
     for col in required_cols:
         if col not in df.columns:
             raise ValueError(f"Columna '{col}' no encontrada en el DataFrame")
-    
-    # Calcular métricas necesarias
-    df['price_change'] = df['close'].pct_change()
-    df['volume_avg'] = df['volume'].rolling(window=20, min_periods=1).mean()
-    df['volume_ratio'] = df['volume'] / df['volume_avg']
-    
-    # Calcular volatilidad (ATR simplificado)
-    high_low = df['high'] - df['low']
-    df['volatility'] = high_low.rolling(window=14, min_periods=1).mean()
-    df['volatility_avg'] = df['volatility'].rolling(window=20, min_periods=1).mean()
-    df['volatility_ratio'] = df['volatility'] / df['volatility_avg']
-    
-    # Identificar fases usando heurísticas simples
-    phases = []
-    
-    for i in range(len(df)):
-        if i < 20:  # No hay suficientes datos
-            phases.append('Unknown')
-            continue
-        
-        price_change = df['price_change'].iloc[i]
-        volume_ratio = df['volume_ratio'].iloc[i]
-        volatility_ratio = df['volatility_ratio'].iloc[i]
-        
-        # Heurísticas simplificadas
-        if price_change > 0.01 and volume_ratio > 1.2 and volatility_ratio < 1.0:
-            phases.append('Markup')  # Subida con volumen alto y volatilidad baja
-        elif price_change < -0.01 and volume_ratio > 1.2 and volatility_ratio < 1.0:
-            phases.append('Markdown')  # Bajada con volumen alto y volatilidad baja
-        elif abs(price_change) < 0.005 and volume_ratio > 1.1 and volatility_ratio < 0.9:
-            phases.append('Accumulation')  # Lateral con volumen alto (acumulación)
-        elif abs(price_change) < 0.005 and volume_ratio > 1.1 and volatility_ratio < 0.9:
-            phases.append('Distribution')  # Lateral con volumen alto (distribución)
-        else:
-            phases.append('Unknown')
-    
-    # Añadir al DataFrame
-    df[output_column] = phases
-    
-    # Limpiar columnas temporales
-    df = df.drop(columns=['price_change', 'volume_avg', 'volume_ratio',
-                          'volatility', 'volatility_avg', 'volatility_ratio'])
-    
+
+    window = 2 * lookback + 1
+    swing_high = df['high'] == df['high'].rolling(window=window, center=True).max()
+    swing_low = df['low'] == df['low'].rolling(window=window, center=True).min()
+
+    resistance = df['high'].where(swing_high).ffill()
+    support = df['low'].where(swing_low).ffill()
+
+    df[f'{output_prefix}_Swing_High'] = swing_high
+    df[f'{output_prefix}_Swing_Low'] = swing_low
+    df[f'{output_prefix}_Resistance'] = resistance
+    df[f'{output_prefix}_Support'] = support
+
+    return df
+
+
+def calculate_pivot_points(df: pd.DataFrame,
+                           output_prefix: str = 'Pivot') -> pd.DataFrame:
+    """
+    Calcula Pivot Points clasicos (PP, R1/R2, S1/S2).
+    """
+    df = df.copy()
+
+    required_cols = ['high', 'low', 'close']
+    for col in required_cols:
+        if col not in df.columns:
+            raise ValueError(f"Columna '{col}' no encontrada en el DataFrame")
+
+    prev_high = df['high'].shift(1)
+    prev_low = df['low'].shift(1)
+    prev_close = df['close'].shift(1)
+
+    pp = (prev_high + prev_low + prev_close) / 3
+    r1 = 2 * pp - prev_low
+    s1 = 2 * pp - prev_high
+    r2 = pp + (prev_high - prev_low)
+    s2 = pp - (prev_high - prev_low)
+
+    df[f'{output_prefix}_PP'] = pp
+    df[f'{output_prefix}_R1'] = r1
+    df[f'{output_prefix}_S1'] = s1
+    df[f'{output_prefix}_R2'] = r2
+    df[f'{output_prefix}_S2'] = s2
+
     return df
